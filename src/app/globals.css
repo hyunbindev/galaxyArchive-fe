@@ -1,5 +1,12 @@
+
+
+
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
+
+
+@import "@milkdown/crepe/theme/common/style.css";
+@import "@milkdown/crepe/theme/frame.css";
 
 @custom-variant dark (&:is(.dark *));
 @font-face {
@@ -122,14 +129,26 @@
 }
 
 @layer base {
+  /* 1. 모든 요소에 계엄령 선포 */
   * {
     @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground font-sans;
-
-    /* 가변 폰트의 부드러움을 극대화하기 위한 안티앨리어싱 */
+    font-family: "Pretendard Variable", ui-sans-serif, system-ui, sans-serif !important;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+
+  /* 2. 하지만 코드 블록(Pre, Code)은 개발자의 가독성을 위해 예외 허용 (선택 사항) */
+  pre, code, kbd, samp, .milkdown .code-fence {
+    font-family: ui-mono, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+.milkdown,
+.milkdown-crepe-wrapper,
+.milkdown * {
+  font-family: "Pretendard Variable", sans-serif !important;
 }

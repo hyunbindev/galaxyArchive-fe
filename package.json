@@ -9,6 +9,10 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@milkdown/crepe": "^7.19.0",
+    "@milkdown/kit": "^7.19.0",
+    "@milkdown/react": "^7.19.0",
+    "@milkdown/theme-nord": "^7.19.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "embla-carousel-react": "^8.6.0",
