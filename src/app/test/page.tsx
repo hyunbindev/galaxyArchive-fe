@@ -31,7 +31,7 @@ export default function GalaxyNetwork() {
         resize();
 
         // --- 1. 데이터 생성 ---
-        const nodeCount = 180;
+        const nodeCount = 30;
         const rawEdges = Array.from({ length: 300 }, () => ({
             u: Math.floor(Math.random() * nodeCount),
             v: Math.floor(Math.random() * nodeCount),

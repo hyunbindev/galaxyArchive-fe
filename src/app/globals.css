@@ -1,12 +1,11 @@
 
-
-
+@import "@milkdown/crepe/theme/common/style.css";
+@import "@milkdown/crepe/theme/frame.css";
+@import "@milkdown/crepe/theme/frame-dark.css";
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
 
 
-@import "@milkdown/crepe/theme/common/style.css";
-@import "@milkdown/crepe/theme/frame.css";
 
 @custom-variant dark (&:is(.dark *));
 @font-face {
@@ -95,20 +94,26 @@
 }
 
 .dark {
-  --background: oklch(0.13 0.028 261.692);
+  --background: oklch(0.19 0.002 260);
   --foreground: oklch(0.985 0.002 247.839);
+
   --card: oklch(0.21 0.034 264.665);
   --card-foreground: oklch(0.985 0.002 247.839);
-  --popover: oklch(0.21 0.034 264.665);
+
+  --popover: oklch(0.19 0.002 260);
   --popover-foreground: oklch(0.985 0.002 247.839);
+
   --primary: oklch(0.928 0.006 264.531);
   --primary-foreground: oklch(0.21 0.034 264.665);
+
   --secondary: oklch(0.278 0.033 256.848);
   --secondary-foreground: oklch(0.985 0.002 247.839);
   --muted: oklch(0.278 0.033 256.848);
   --muted-foreground: oklch(0.707 0.022 261.325);
-  --accent: oklch(0.278 0.033 256.848);
+
+  --accent: oklch(0.25 0.002 260);
   --accent-foreground: oklch(0.985 0.002 247.839);
+
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
@@ -129,7 +134,6 @@
 }
 
 @layer base {
-  /* 1. 모든 요소에 계엄령 선포 */
   * {
     @apply border-border outline-ring/50;
     font-family: "Pretendard Variable", ui-sans-serif, system-ui, sans-serif !important;
@@ -137,7 +141,6 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
-  /* 2. 하지만 코드 블록(Pre, Code)은 개발자의 가독성을 위해 예외 허용 (선택 사항) */
   pre, code, kbd, samp, .milkdown .code-fence {
     font-family: ui-mono, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
   }
@@ -151,4 +154,7 @@
 .milkdown-crepe-wrapper,
 .milkdown * {
   font-family: "Pretendard Variable", sans-serif !important;
+}
+.milkdown .editor {
+  padding: 2rem !important;
 }
