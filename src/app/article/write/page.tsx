@@ -3,6 +3,7 @@
 import MilkdownEditor from "@/components/editor/MilkdownEditor";
 import { Button } from "@/components/ui/button"
 import {useEffect, useState} from "react";
+import api from "@/lib/api";
 
 export default function WritePage(){
     const date = new Date();
@@ -12,6 +13,10 @@ export default function WritePage(){
     useEffect(()=>{
         setCharacterCount(text.length);
     },[text])
+
+    useEffect(()=>{
+        api.post("/api/v1/article", {"title": "test", "text": "text titled"}).then( r => console.log(r))
+    },[])
 
     return(<main className="relative max-w-6xl mx-auto bg-background min-h-full pb-20">
 
