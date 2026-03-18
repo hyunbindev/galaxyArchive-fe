@@ -1,28 +1,39 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { Crepe } from "@milkdown/crepe";
+import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import "@milkdown/crepe/theme/frame-dark.css";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
 
-export default function MilkdownEditor() {
+interface Props{
+    onChange?: (markdown: string)=> void;
+}
+
+export default function MilkdownEditor(props: Props) {
     const editorRef = useRef<HTMLDivElement>(null);
     const crepeRef = useRef<Crepe | null>(null);
 
     useEffect(() => {
         // 서버 사이드 렌더링 방지 및 중복 생성 방지
         if (!editorRef.current || crepeRef.current) return;
-
-        // Crepe 인스턴스 생성 (슬래시 메뉴, 블록 핸들 등이 기본 포함됨)
-        const crepe = new Crepe({
-            root: editorRef.current,
-            defaultValue: '', // Placeholder를 보여주려면 비워둬야 합니다.
-            featureConfigs: {
-                'placeholder': {
-                    text: '"/"입력시 추가할 태그가 보여집니다.',
+            const crepe = new Crepe({
+                root: editorRef.current,
+                defaultValue: '',
+                featureConfigs: {
+                    'placeholder': {
+                        text: ' / 입력시 추가할 태그가 보여집니다.',
+                    },
                 },
-            },
+            });
+
+            const { editor } = crepe;
+
+            editor.config((ctx) => {
+                ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
+                props.onChange?.(markdown);
+            });
         });
 
         // 에디터 생성
