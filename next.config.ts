@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  async rewrites() {
+    return [
+      {
+        source: '/api/v1/:path*', // 프론트에서 /api/v1/... 으로 보내면
+        destination: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/:path*`, // 백엔드로 전달
+      },
+    ];
+  },
   reactCompiler: true,
 };
-
 export default nextConfig;

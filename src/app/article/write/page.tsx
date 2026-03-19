@@ -16,6 +16,7 @@ export default function WritePage(){
 
     useEffect(()=>{
         api.post("/api/v1/article", {"title": "test", "text": "text titled"}).then( r => console.log(r))
+            .catch(e=>console.error(e))
     },[])
 
     return(<main className="relative max-w-6xl mx-auto bg-background min-h-full pb-20">
