@@ -7,9 +7,15 @@ export async function Header() {
     const userInfo = await getUser();
     return (
         <header className="sticky top-0 h-15 w-full flex justify-center items-center p-2 bg-white dark:bg-background backdrop-blur-md z-50 border-b border-border/50">
-            <div className="max-w-6xl mx-auto flex justify-between items-center w-full">
-                <h1 className="font-bold text-foreground">galaxyArchive</h1>
-
+            <div className="w-full px-10 min-w-6xl mx-auto flex justify-between items-center">
+                <a href="/">
+                    <h1 className="font-bold text-lg text-foreground">galaxyArchive</h1>
+                </a>
+                <nav className="flex flex-1 justify-start gap-5 px-20
+                                [&>a]:cursor-pointer
+                                [&>a]:text-sm">
+                    <a href="/article/write">Publish Article</a>
+                </nav>
                     <div className="flex items-center gap-2">
                         <ThemeModeToggle />
                         {userInfo? (

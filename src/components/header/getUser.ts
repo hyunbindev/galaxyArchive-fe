@@ -1,5 +1,6 @@
 import {cookies} from "next/dist/server/request/cookies";
 import api from "@/lib/api";
+import axios from "axios";
 
 export async function getUser(){
     const cookieStore = await cookies()
@@ -13,10 +14,13 @@ export async function getUser(){
                 Cookie: `JSESSIONID=${sessionId}`,
             },
         });
-        console.log(response);
         return response.data;
     }catch(err){
-        console.error(err);
+        //AXIOS EXCEPTION HANDLER
+        if(axios.isAxiosError(err)){
+            const status = err.response?.status
+            if(status == 401) cookieStore.delete("JSESSIONID");
+        }
         return null;
     }
 }

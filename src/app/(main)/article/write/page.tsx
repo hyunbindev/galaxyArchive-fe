@@ -4,20 +4,12 @@ import MilkdownEditor from "@/components/editor/MilkdownEditor";
 import { Button } from "@/components/ui/button"
 import {useEffect, useState} from "react";
 import api from "@/lib/api";
+import useCreateArticle from "@/app/(main)/article/write/userCreateArticle";
 
 export default function WritePage(){
     const date = new Date();
-    const [text,setText] = useState<String>('');
-    const [characterCount,setCharacterCount] = useState<number>(0);
 
-    useEffect(()=>{
-        setCharacterCount(text.length);
-    },[text])
-
-    useEffect(()=>{
-        api.post("/api/v1/article", {"title": "test", "text": "text titled"}).then( r => console.log(r))
-            .catch(e=>console.error(e))
-    },[])
+    const {title, setTitle ,text, setText , publishArticle} = useCreateArticle();
 
     return(<main className="relative max-w-6xl mx-auto bg-background min-h-full pb-20">
 
@@ -25,6 +17,8 @@ export default function WritePage(){
             <div className="w-full flex flex-col pt-10">
                 <span className="text-gray-500">{date.getFullYear()}.{date.getMonth()+1}.{date.getDate()}</span>
                 <input
+                    value={title}
+                    onChange={e=>setTitle(e.target.value)}
                     id="title"
                     className="text-4xl border-none outline-none focus:ring-0 bg-transparent border-3"
                     placeholder="제목을 입력해 주세요."
@@ -36,10 +30,10 @@ export default function WritePage(){
         </div>
         <footer className="fixed bottom-0 left-0 w-full border-t border-border/50 bg-background">
             <div className="max-w-6xl mx-auto flex justify-between items-center py-5 w-full">
-                <div>{characterCount} characters</div>
+                <div>{text.length.toLocaleString()} characters</div>
                 <div>
-                    <Button variant="outline" size="sm">
-                        Create Article
+                    <Button onClick={publishArticle} disabled={text.length<1 || title.length<1} className="text-md cursor-pointer" variant="outline" size="lg">
+                        Publish Article
                     </Button>
                 </div>
             </div>
