@@ -4,15 +4,15 @@ import MilkdownEditor from "@/components/editor/MilkdownEditor";
 import { Button } from "@/components/ui/button"
 import {useEffect, useState} from "react";
 import api from "@/lib/api";
-import useCreateArticle from "@/app/(main)/article/write/userCreateArticle";
+import useCreateArticle from "@/app/(main)/article/write/useCreateArticle";
 
 export default function WritePage(){
     const date = new Date();
 
     const {title, setTitle ,text, setText , publishArticle} = useCreateArticle();
 
-    return(<main className="relative max-w-6xl mx-auto bg-background min-h-full pb-20">
-
+    return(
+    <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
         <div className="flex-col">
             <div className="w-full flex flex-col pt-10">
                 <span className="text-gray-500">{date.getFullYear()}.{date.getMonth()+1}.{date.getDate()}</span>
@@ -38,5 +38,6 @@ export default function WritePage(){
                 </div>
             </div>
         </footer>
-    </main>)
+    </main>
+    )
 }

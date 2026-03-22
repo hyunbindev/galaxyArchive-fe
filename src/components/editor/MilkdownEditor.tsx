@@ -18,21 +18,22 @@ export default function MilkdownEditor(props: Props) {
     useEffect(() => {
         // 서버 사이드 렌더링 방지 및 중복 생성 방지
         if (!editorRef.current || crepeRef.current) return;
-            const crepe = new Crepe({
-                root: editorRef.current,
-                defaultValue: '',
-                featureConfigs: {
-                    'placeholder': {
-                        text: ' / 입력시 추가할 태그가 보여집니다.',
-                    },
+
+        const crepe = new Crepe({
+            root: editorRef.current,
+            defaultValue: '',
+            featureConfigs: {
+                'placeholder': {
+                    text: ' / 입력시 추가할 태그가 보여집니다.',
                 },
-            });
+            },
+        });
 
-            const { editor } = crepe;
+        const { editor } = crepe;
 
-            editor.config((ctx) => {
-                ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
-                props.onChange?.(markdown);
+        editor.config((ctx) => {
+            ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
+            props.onChange?.(markdown);
             });
         });
 
