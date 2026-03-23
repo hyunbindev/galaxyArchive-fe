@@ -2,14 +2,14 @@
 
 import MilkdownEditor from "@/components/editor/MilkdownEditor";
 import { Button } from "@/components/ui/button"
-import {useEffect, useState} from "react";
-import api from "@/lib/api";
 import useCreateArticle from "@/app/(main)/article/write/useCreateArticle";
+import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
+import {Spinner} from "@/components/ui/spinner";
 
 export default function WritePage(){
     const date = new Date();
 
-    const {title, setTitle ,text, setText , publishArticle} = useCreateArticle();
+    const {title, setTitle ,text, setText , publishArticle, isUploading} = useCreateArticle();
 
     return(
     <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
@@ -38,6 +38,16 @@ export default function WritePage(){
                 </div>
             </div>
         </footer>
+        {isUploading && <Dialog open={true}>
+            <DialogContent showCloseButton={false}>
+                <DialogHeader>
+                    <DialogTitle>GalaxyArchive</DialogTitle>
+                    <DialogDescription>
+                        Uploading Article to GalaxyArchive..
+                    </DialogDescription>
+                </DialogHeader>
+            </DialogContent>
+        </Dialog>}
     </main>
     )
 }
