@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useRef, useState} from "react";
-import { Crepe } from "@milkdown/crepe";
+import {Crepe, CrepeFeature} from "@milkdown/crepe";
 import { listener, listenerCtx } from '@milkdown/plugin-listener';
 import "@milkdown/crepe/theme/frame-dark.css";
 import "@milkdown/crepe/theme/common/style.css";
@@ -15,6 +15,12 @@ export default function MilkdownEditor(props: Props) {
     const editorRef = useRef<HTMLDivElement>(null);
     const crepeRef = useRef<Crepe | null>(null);
 
+    const [images, setImages] = useState<File[]>([]);
+
+    useEffect(()=>{
+        console.log(images)
+    },[images])
+
     useEffect(() => {
         // 서버 사이드 렌더링 방지 및 중복 생성 방지
         if (!editorRef.current || crepeRef.current) return;
@@ -26,6 +32,12 @@ export default function MilkdownEditor(props: Props) {
                 'placeholder': {
                     text: ' / 입력시 추가할 태그가 보여집니다.',
                 },
+                [CrepeFeature.ImageBlock]: {
+                    onUpload: async (file:File):Promise<string>=>{
+                        setImages(prev=>[...prev,file])
+                        return URL.createObjectURL(file);
+                    }
+                }
             },
         });
 

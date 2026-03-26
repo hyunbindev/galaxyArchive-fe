@@ -43,7 +43,6 @@ export default async function Page({ params }: { params: { id: string } }){
                 </div>
             </div>
 
-            <DynamicSkeleton markdown={article.text}/>
 
             <div className="milkdown editor prosemirror-virtual-cursor-animation">
                 <div className="prose dark:prose-invert max-w-none">

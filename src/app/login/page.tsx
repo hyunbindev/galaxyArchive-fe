@@ -1,9 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 
-import githubIcon from '@/assets/icon/GitHub_Invertocat_Black.svg'
-import {Link} from "lucide-react";
-
 export default function LoginPage(){
     return(
         <div className="flex flex-col items-center justify-center h-screen bg-backgorund">

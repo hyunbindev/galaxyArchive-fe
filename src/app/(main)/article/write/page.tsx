@@ -42,10 +42,12 @@ export default function WritePage(){
             <DialogContent showCloseButton={false}>
                 <DialogHeader>
                     <DialogTitle>GalaxyArchive</DialogTitle>
+                </DialogHeader>
+                <div className="flex">
                     <DialogDescription>
                         Uploading Article to GalaxyArchive..
                     </DialogDescription>
-                </DialogHeader>
+                </div>
             </DialogContent>
         </Dialog>}
     </main>
