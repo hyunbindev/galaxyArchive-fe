@@ -10,12 +10,16 @@ import "@milkdown/crepe/theme/frame.css";
 interface Props{
     onChange?: (markdown: string)=> void;
 }
+interface Image{
+    url:string;
+    image:File;
+}
 
 export default function MilkdownEditor(props: Props) {
     const editorRef = useRef<HTMLDivElement>(null);
     const crepeRef = useRef<Crepe | null>(null);
 
-    const [images, setImages] = useState<File[]>([]);
+    const [images, setImages] = useState<Image[]>([]);
 
     useEffect(()=>{
         console.log(images)
@@ -34,8 +38,12 @@ export default function MilkdownEditor(props: Props) {
                 },
                 [CrepeFeature.ImageBlock]: {
                     onUpload: async (file:File):Promise<string>=>{
-                        setImages(prev=>[...prev,file])
-                        return URL.createObjectURL(file);
+
+                        const tempImage:Image = { url:URL.createObjectURL(file), image:file }
+
+                        setImages(prev=>[...prev, tempImage])
+
+                        return tempImage.url;
                     }
                 }
             },
