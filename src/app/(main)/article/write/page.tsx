@@ -9,7 +9,7 @@ import {Spinner} from "@/components/ui/spinner";
 export default function WritePage(){
     const date = new Date();
 
-    const {title, setTitle ,text, setText , publishArticle, isUploading} = useCreateArticle();
+    const {title, setTitle ,text, setText , publishArticle, isUploading ,onImageUpload} = useCreateArticle();
 
     return(
     <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
@@ -25,7 +25,7 @@ export default function WritePage(){
                 />
             </div>
             <div className="flex-1">
-                <MilkdownEditor onChange={setText}/>
+                <MilkdownEditor onChange={setText} onImageUpload={onImageUpload}/>
             </div>
         </div>
         <footer className="fixed bottom-0 left-0 w-full border-t border-border/50 bg-background">
