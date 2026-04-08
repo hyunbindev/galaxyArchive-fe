@@ -4,48 +4,46 @@ import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} fro
 import {Crepe, CrepeFeature} from "@milkdown/crepe";
 import { listenerCtx } from '@milkdown/plugin-listener';
 import { editorViewCtx } from '@milkdown/kit/core';
+import { nodesCtx } from '@milkdown/core';
 import "@milkdown/crepe/theme/frame-dark.css";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
-import { Node } from '@milkdown/kit/prose/model';
+
+
 interface Props{
     onChange?: (markdown: string)=>void;
-    onImageUpload: (file:File)=>Promise<string>;
 }
 export interface MilkdownEditorRef {
-    getImages: () => Node[] | undefined;
+    getImages: () => Map<number,string>|undefined;
     changeImageUrl: (ori: string, url:string) => void;
 }
 
 const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
     const editorRef = useRef<HTMLDivElement>(null);
     const crepeRef = useRef<Crepe | null>(null)
-    const [debug, setDebug] = useState<Node | null>(null)
 
-
-        //TODO- Impl replace image url
         useImperativeHandle(ref, () => ({
-            getImages:(): Node[]|undefined =>{
-
+            getImages:(): Map<number,string>|undefined =>{
 
                 if(!crepeRef.current) return;
                 const { editor } = crepeRef.current
 
                 return editor.action((ctx)=>{
                     const { doc } = ctx.get(editorViewCtx).state
-                    const imageNodes:Node[] = [];
 
-                    doc.descendants((node)=>{
-                        if(node.type.name == 'image-block') imageNodes.push(node);
+                    const imageMap = new Map<number,string>();
+
+                    doc.descendants((node, pos) => {
+
+                        if (node.type.name == 'image-block') imageMap.set(pos, node.attrs.src);
+                        console.log(node);
                     })
 
-
-                    return imageNodes;
+                    return imageMap;
                 });
             },
             changeImageUrl:(ori:string,url:string)=>{}
         }));
-    useEffect(()=>console.log(debug?.descendants((node,pos,parent)=>{console.log(node)})),[debug])
 
     useEffect(() => {
         // 서버 사이드 렌더링 방지 및 중복 생성 방지
@@ -58,28 +56,12 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                 'placeholder': {
                     text: ' / 입력시 추가할 태그가 보여집니다.',
                 },
-                [CrepeFeature.ImageBlock]: {
-                    onUpload: async (file:File):Promise<string>=>{
-                        return props.onImageUpload(file);
-                    }
-                }
             },
         });
 
 
-
-
         const { editor } = crepe;
 
-        crepe.on((listener)=>{
-            listener.markdownUpdated(()=>{
-                editor.action((ctx)=>{
-                    const { doc } = ctx.get(editorViewCtx).state
-                    setDebug(doc)
-                });
-
-            })
-        })
 
         editor.config((ctx) => {
             ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {

@@ -1,27 +1,49 @@
 "use client"
-import {useEffect, useState} from "react";
+import {RefObject, useEffect, useState} from "react";
 import api from "@/lib/api";
 import {useRouter} from "next/navigation";
+import {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
+import {blob} from "node:stream/consumers";
 
 interface Image{
     url:string;
     image:File;
 }
-export default function useCreateArticle(){
-    const [title, setTitle] = useState<string>('')
-    const [text, setText] = useState<string>('')
+export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
+    const [title, setTitle] = useState<string>('');
+    const [text, setText] = useState<string>('');
     const [isUploading, setIsUploading] = useState<boolean>(false);
-    const [images,setImages] = useState<Image[]>([]);
 
     const router = useRouter()
 
-    useEffect(()=>{console.log(images)},[images])
+    const getImageMapFromEditor=():Map<number,string>|undefined=>{
+        if(!ref.current) return;
+        return ref.current.getImages();
+    }
+    const ensureValidMimeType = (type: string) => {
+        if (type.length === 0) throw Error("잘못된 이미지입니다.");
+    };
 
+    const uploadImage = async(blobUrl:string)=>{
+        try{
+            const blobResponse = await fetch(blobUrl);
+            const imageBlob = await blobResponse.blob();
 
-    const onImageUpload = async(file:File)=>{
-        const image = {url:URL.createObjectURL(file), image:file}
-        setImages(prev => [...prev, image]);
-        return image.url;
+            const mimeType:string = imageBlob.type
+
+            if(mimeType.length==0) ensureValidMimeType("잘못된 이미지 입니다")
+
+            const response = await api.post("/api/v1/articles/images", imageBlob,{
+                headers: {
+                    "Content-Type": mimeType,
+                    "Content-Length": imageBlob.size.toString(),
+                }
+            })
+
+            return response.data.url;
+        }catch (e){
+            throw e
+        }
     }
 
     const publishArticle = async()=>{
@@ -35,8 +57,9 @@ export default function useCreateArticle(){
         }catch (err){
             console.error(err)
             setIsUploading(false);
+            throw err
         }
     }
 
-    return {title, setTitle, text, setText ,publishArticle, isUploading ,onImageUpload }
+    return {title, setTitle, text, setText ,publishArticle, isUploading }
 }

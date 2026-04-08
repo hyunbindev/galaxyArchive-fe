@@ -1,19 +1,19 @@
 "use client";
 
-import MilkdownEditor from "@/components/editor/MilkdownEditor";
+import MilkdownEditor, {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
 import { Button } from "@/components/ui/button"
 import useCreateArticle from "@/app/(main)/article/write/useCreateArticle";
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
-import {Spinner} from "@/components/ui/spinner";
+import {useRef} from "react";
 
 export default function WritePage(){
     const date = new Date();
-
-    const {title, setTitle ,text, setText , publishArticle, isUploading ,onImageUpload} = useCreateArticle();
-
+    const editorRef = useRef<MilkdownEditorRef>(null);
+    const {title, setTitle ,text, setText , publishArticle, isUploading } = useCreateArticle(editorRef);
     return(
     <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
         <div className="flex-col">
+
             <div className="w-full flex flex-col pt-10">
                 <span className="text-gray-500">{date.getFullYear()}.{date.getMonth()+1}.{date.getDate()}</span>
                 <input
@@ -24,8 +24,9 @@ export default function WritePage(){
                     placeholder="제목을 입력해 주세요."
                 />
             </div>
+            <button onClick={()=>{console.log(editorRef.current?.getImages())}}>test btn</button>
             <div className="flex-1">
-                <MilkdownEditor onChange={setText} onImageUpload={onImageUpload}/>
+                <MilkdownEditor onChange={setText}  ref={editorRef}/>
             </div>
         </div>
         <footer className="fixed bottom-0 left-0 w-full border-t border-border/50 bg-background">
