@@ -13,15 +13,38 @@ interface Props{
     onImageUpload: (file:File)=>Promise<string>;
 }
 export interface MilkdownEditorRef {
-    getImage: () => Node | undefined;
+    getImages: () => Node[] | undefined;
     changeImageUrl: (ori: string, url:string) => void;
 }
 
 const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
     const editorRef = useRef<HTMLDivElement>(null);
     const crepeRef = useRef<Crepe | null>(null)
-
     const [debug, setDebug] = useState<Node | null>(null)
+
+
+        //TODO- Impl replace image url
+        useImperativeHandle(ref, () => ({
+            getImages:(): Node[]|undefined =>{
+
+
+                if(!crepeRef.current) return;
+                const { editor } = crepeRef.current
+
+                return editor.action((ctx)=>{
+                    const { doc } = ctx.get(editorViewCtx).state
+                    const imageNodes:Node[] = [];
+
+                    doc.descendants((node)=>{
+                        if(node.type.name == 'image-block') imageNodes.push(node);
+                    })
+
+
+                    return imageNodes;
+                });
+            },
+            changeImageUrl:(ori:string,url:string)=>{}
+        }));
     useEffect(()=>console.log(debug?.descendants((node,pos,parent)=>{console.log(node)})),[debug])
 
     useEffect(() => {
@@ -69,20 +92,6 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
         // 에디터 생성
         crepe.create().then(() => {
             crepeRef.current = crepe;
-            //TODO- Impl replace image url
-            useImperativeHandle(ref, () => ({
-                getImage:()=>{
-                    editor.action((ctx)=>{
-                        const { doc } = ctx.get(editorViewCtx).state
-                        const imageNodes:Node[] = [];
-                        doc.descendants((node,number)=>{
-                            node
-                        });
-                        return imageNodes
-                    });
-                },
-                changeImageUrl:(ori:string,url:string)=>{}
-            }));
         });
 
 
@@ -96,4 +105,5 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
 
     return <div><div ref={editorRef}/></div>
 });
+MilkdownEditor.displayName = 'MilkdownEditor';
 export default MilkdownEditor;
