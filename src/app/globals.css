@@ -1,6 +1,6 @@
 @import "@milkdown/crepe/theme/common/style.css";
-@import "@milkdown/crepe/theme/frame.css";
-@import "@milkdown/crepe/theme/frame-dark.css";
+@import "./style/crepe-light.css";
+@import "./style/crepe-dark.css";
 @import "tailwindcss";
 @import "shadcn/tailwind.css";
 
