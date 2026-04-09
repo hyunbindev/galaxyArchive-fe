@@ -24,7 +24,9 @@ export default function WritePage(){
                     placeholder="제목을 입력해 주세요."
                 />
             </div>
-            <button onClick={()=>{console.log(editorRef.current?.getImages())}}>test btn</button>
+
+            {/*<button onClick={()=>{console.log(editorRef.current?.getImages())}}>test btn</button>*/}
+
             <div className="flex-1">
                 <MilkdownEditor onChange={setText}  ref={editorRef}/>
             </div>

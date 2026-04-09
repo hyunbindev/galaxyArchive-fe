@@ -47,8 +47,6 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
 
     useEffect(() => {
         // 서버 사이드 렌더링 방지 및 중복 생성 방지
-        if (!editorRef.current || crepeRef.current) return;
-
         const crepe = new Crepe({
             root: editorRef.current,
             defaultValue: '',
@@ -59,6 +57,8 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
             },
         });
 
+        if (!editorRef.current && crepeRef.current) return;
+        crepeRef.current=crepe
 
         const { editor } = crepe;
 
@@ -80,10 +80,10 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
         // 컴포넌트 파괴 시 에디터 자원 해제
         return () => {
             if (crepeRef.current) {
-                crepeRef.current.destroy().then(r => crepeRef.current = null);
+                crepeRef.current.destroy().then(_ => crepeRef.current = null);
             }
         };
-    }, []);
+    }, [props]);
 
     return <div><div ref={editorRef}/></div>
 });
