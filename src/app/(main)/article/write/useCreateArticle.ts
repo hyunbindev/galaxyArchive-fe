@@ -5,14 +5,29 @@ import {useRouter} from "next/navigation";
 import {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
 import {blob} from "node:stream/consumers";
 
-interface Image{
-    url:string;
-    image:File;
+
+
+export interface UploadStatus {
+    uploadPhase:UploadPhase;
+    imageStatus: Map<number,number>|null;
+    errorMsg:string|null;
+}
+export enum UploadPhase{
+    IDLE = 'IDLE',
+    IMAGE_UPLOAD = 'IMAGEUPLOAD',
+    TEXTUP_LOAD = 'TEXTUPLOAD',
+    SUCCESS = 'SUCCESS',
+    FAIL = 'FAIL',
 }
 export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
     const [title, setTitle] = useState<string>('');
     const [text, setText] = useState<string>('');
-    const [isUploading, setIsUploading] = useState<boolean>(false);
+
+    const [upLoadState, setUpLoadState] = useState<UploadStatus>({
+        uploadPhase: UploadPhase.IMAGE_UPLOAD,
+        imageStatus:null,
+        errorMsg:null
+    });
 
     const router = useRouter()
 
@@ -20,11 +35,12 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
         if(!ref.current) return;
         return ref.current.getImages();
     }
+
     const ensureValidMimeType = (type: string) => {
         if (type.length === 0) throw Error("잘못된 이미지입니다.");
     };
 
-    const uploadImage = async(blobUrl:string)=>{
+    const uploadImage = async (pos:number,blobUrl:string)=>{
         try{
             const blobResponse = await fetch(blobUrl);
             const imageBlob = await blobResponse.blob();
@@ -37,9 +53,29 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                 headers: {
                     "Content-Type": mimeType,
                     "Content-Length": imageBlob.size.toString(),
+                },
+                onUploadProgress:(progressEvent)=>{
+                    const percent = Math.round(
+                        (progressEvent.loaded * 100) / (progressEvent.total || imageBlob.size)
+                    )
+                    setUpLoadState(prev => {
+                        const nextMap = new Map(prev.imageStatus);
+
+                        nextMap.set(pos, percent);
+
+                        return {
+                            ...prev,
+                            imageStatus: nextMap
+                        };
+                    });
                 }
             })
-
+            setUpLoadState(prev => {
+                return {
+                    ...prev,
+                    uploadPhase:UploadPhase.SUCCESS
+                };
+            });
             return response.data.url;
         }catch (e){
             throw e
@@ -48,18 +84,41 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
     const publishArticle = async()=>{
         try {
+            const articleImages = getImageMapFromEditor();
+
+            if (articleImages) {
+                const imageStatusMap = new Map();
+
+                articleImages.forEach((_,pos)=>{imageStatusMap.set(pos,0)})
+
+                setUpLoadState(prev => ({
+                    ...prev,
+                    uploadPhase: UploadPhase.IMAGE_UPLOAD,
+                    imageStatus: imageStatusMap
+                }));
+
+                for(const [pos,blobUrl] of articleImages){
+                    const uploadedUrl = await uploadImage(pos,blobUrl);
+                    //TODO- replace node attrs url
+
+                }
+            }
+
+            setUpLoadState(prev => ({ ...prev, phase: UploadPhase.TEXTUP_LOAD }));
+
+
             const response =await api.post("/api/v1/articles",{
                 title:title,
                 text:text,
             })
-            setIsUploading(true);
+
             router.replace(`/article/${response.data}`)
         }catch (err){
             console.error(err)
-            setIsUploading(false);
+            setUpLoadState(prev => ({ ...prev, phase: UploadPhase.FAIL, }));
             throw err
         }
     }
 
-    return {title, setTitle, text, setText ,publishArticle, isUploading }
+    return {title, setTitle, text, setText ,publishArticle, upLoadState }
 }

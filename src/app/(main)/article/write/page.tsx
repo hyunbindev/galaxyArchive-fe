@@ -1,15 +1,17 @@
 "use client";
 
 import MilkdownEditor, {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
-import { Button } from "@/components/ui/button"
-import useCreateArticle from "@/app/(main)/article/write/useCreateArticle";
+import {Button} from "@/components/ui/button"
+import useCreateArticle, {UploadPhase} from "@/app/(main)/article/write/useCreateArticle";
 import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {useRef} from "react";
+import {Field, FieldLabel} from "@/components/ui/field";
+import {Progress} from "@/components/ui/progress";
 
 export default function WritePage(){
     const date = new Date();
     const editorRef = useRef<MilkdownEditorRef>(null);
-    const {title, setTitle ,text, setText , publishArticle, isUploading } = useCreateArticle(editorRef);
+    const {title, setTitle ,text, setText , publishArticle, upLoadState } = useCreateArticle(editorRef);
     return(
     <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
         <div className="flex-col">
@@ -41,16 +43,35 @@ export default function WritePage(){
                 </div>
             </div>
         </footer>
-        {isUploading && <Dialog open={true}>
+        {upLoadState.uploadPhase != UploadPhase.IDLE && <Dialog open={true}>
             <DialogContent showCloseButton={false}>
                 <DialogHeader>
                     <DialogTitle>GalaxyArchive</DialogTitle>
                 </DialogHeader>
-                <div className="flex">
-                    <DialogDescription>
-                        Uploading Article to GalaxyArchive..
+                    <DialogDescription className="text-gray-600">
+                        Launching Article to GalaxyArchive...
                     </DialogDescription>
-                </div>
+
+                {upLoadState.imageStatus && Array.from(upLoadState.imageStatus).map(([_, percent]) => (
+
+                    <Field className="w-full text-gray-500">
+                        <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
+                            <span>Ready to launch image..</span>
+                            <span className="ml-auto">{percent}%</span>
+                        </FieldLabel>
+                        <Progress value={percent} className={`${percent == 100 ? "bg-green-500" : ""}`} id="progress-upload" />
+                    </Field>
+                ))}
+
+                <Field className="w-full text-gray-500">
+                    <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
+                        <span>Ready to launch article..</span>
+                        <span className="ml-auto">{50}%</span>
+                    </FieldLabel>
+                    <Progress value={50} id="progress-upload" />
+                </Field>
+
+                {upLoadState.uploadPhase == UploadPhase.SUCCESS && <div>성공ㅋ</div>}
             </DialogContent>
         </Dialog>}
     </main>
