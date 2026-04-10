@@ -24,7 +24,7 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
     const [text, setText] = useState<string>('');
 
     const [upLoadState, setUpLoadState] = useState<UploadStatus>({
-        uploadPhase: UploadPhase.IMAGE_UPLOAD,
+        uploadPhase: UploadPhase.IDLE,
         imageStatus:null,
         errorMsg:null
     });
@@ -51,9 +51,12 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
             const response = await api.post("/api/v1/articles/images", imageBlob,{
                 headers: {
-                    "Content-Type": mimeType,
-                    "Content-Length": imageBlob.size.toString(),
+                    "Content-Type": "application/octet-stream",
+                    "X-Content-Type": mimeType,
+                    "X-Content-Length": imageBlob.size.toString(),
                 },
+                transformRequest: [(data) => data],
+                responseType: 'blob',
                 onUploadProgress:(progressEvent)=>{
                     const percent = Math.round(
                         (progressEvent.loaded * 100) / (progressEvent.total || imageBlob.size)
@@ -70,12 +73,6 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     });
                 }
             })
-            setUpLoadState(prev => {
-                return {
-                    ...prev,
-                    uploadPhase:UploadPhase.SUCCESS
-                };
-            });
             return response.data.url;
         }catch (e){
             throw e
@@ -94,17 +91,17 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                 setUpLoadState(prev => ({
                     ...prev,
                     uploadPhase: UploadPhase.IMAGE_UPLOAD,
-                    imageStatus: imageStatusMap
+                    imageStatus: new Map(imageStatusMap)
                 }));
 
                 for(const [pos,blobUrl] of articleImages){
                     const uploadedUrl = await uploadImage(pos,blobUrl);
                     //TODO- replace node attrs url
-
+                    console.log(`${pos} : uploadedUrl`)
                 }
             }
 
-            setUpLoadState(prev => ({ ...prev, phase: UploadPhase.TEXTUP_LOAD }));
+            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.TEXTUP_LOAD }));
 
 
             const response =await api.post("/api/v1/articles",{
@@ -112,10 +109,12 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                 text:text,
             })
 
-            router.replace(`/article/${response.data}`)
+            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.SUCCESS }));
+
+            //router.replace(`/article/${response.data}`)
         }catch (err){
             console.error(err)
-            setUpLoadState(prev => ({ ...prev, phase: UploadPhase.FAIL, }));
+            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.FAIL, }));
             throw err
         }
     }

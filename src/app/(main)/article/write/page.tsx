@@ -43,6 +43,8 @@ export default function WritePage(){
                 </div>
             </div>
         </footer>
+
+
         {upLoadState.uploadPhase != UploadPhase.IDLE && <Dialog open={true}>
             <DialogContent showCloseButton={false}>
                 <DialogHeader>
@@ -59,16 +61,16 @@ export default function WritePage(){
                             <span>Ready to launch image..</span>
                             <span className="ml-auto">{percent}%</span>
                         </FieldLabel>
-                        <Progress value={percent} className={`${percent == 100 ? "bg-green-500" : ""}`} id="progress-upload" />
+                        <Progress value={percent} id="progress-upload" />
                     </Field>
                 ))}
 
                 <Field className="w-full text-gray-500">
                     <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
                         <span>Ready to launch article..</span>
-                        <span className="ml-auto">{50}%</span>
+                        <span className="ml-auto">{upLoadState.uploadPhase == UploadPhase.SUCCESS ? 100 : 0}%</span>
                     </FieldLabel>
-                    <Progress value={50} id="progress-upload" />
+                    <Progress value={upLoadState.uploadPhase == UploadPhase.SUCCESS ? 100 : 0} id="progress-upload" />
                 </Field>
 
                 {upLoadState.uploadPhase == UploadPhase.SUCCESS && <div>성공ㅋ</div>}
