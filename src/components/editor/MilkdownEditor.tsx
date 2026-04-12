@@ -3,7 +3,7 @@
 import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
 import {Crepe, CrepeFeature} from "@milkdown/crepe";
 import { listenerCtx } from '@milkdown/plugin-listener';
-import { editorViewCtx } from '@milkdown/kit/core';
+import {editorViewCtx, editorViewOptionsCtx, serializerCtx} from '@milkdown/kit/core';
 import { nodesCtx } from '@milkdown/core';
 import "@milkdown/crepe/theme/frame-dark.css";
 import "@milkdown/crepe/theme/common/style.css";
@@ -15,7 +15,9 @@ interface Props{
 }
 export interface MilkdownEditorRef {
     getImages: () => Map<number,string>|undefined;
-    changeImageUrl: (ori: string, url:string) => void;
+    getText: ()=>string;
+    changeImageUrl: (pos:number,url:string) => void;
+    setReadOnly: (readOnly:boolean)=>void;
 }
 
 const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
@@ -42,7 +44,34 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                     return imageMap;
                 });
             },
-            changeImageUrl:(ori:string,url:string)=>{}
+            changeImageUrl:(pos:number,url:string)=>{
+                if (!crepeRef.current) return;
+                const { editor } = crepeRef.current;
+
+                editor.action((ctx)=>{
+                    const view = ctx.get(editorViewCtx);
+                    const {tr} = view.state;
+
+                    const transaction = tr.setNodeMarkup(pos, undefined, {
+                        src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL!}/${url}`,
+                    })
+                    view.dispatch(transaction)
+                })
+            },
+            getText:():string=>{
+                if (!crepeRef.current) return "";
+                return crepeRef.current.getMarkdown()
+            },
+            setReadOnly:(readOnly:boolean)=>{
+                if(!crepeRef.current) return;
+                const { editor } =crepeRef.current;
+                editor.action((ctx) => {
+                    const view = ctx.get(editorViewCtx);
+                    view.setProps({
+                        editable: () => !readOnly
+                    });
+                });
+            }
         }));
 
     useEffect(() => {
@@ -67,6 +96,11 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
             ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
                 props.onChange?.(markdown);
             });
+            ctx.update(editorViewOptionsCtx, (prev) => ({
+                ...prev,
+                scrollThreshold: 100,
+                scrollMargin: 120,
+            }));
         });
 
 
@@ -77,13 +111,12 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
         });
 
 
-        // 컴포넌트 파괴 시 에디터 자원 해제
         return () => {
-            if (crepeRef.current) {
-                crepeRef.current.destroy().then(_ => crepeRef.current = null);
-            }
+            const currentCrepe = crepeRef.current;
+            crepeRef.current = null;
+            currentCrepe?.destroy();
         };
-    }, [props]);
+    }, []);
 
     return <div><div ref={editorRef}/></div>
 });

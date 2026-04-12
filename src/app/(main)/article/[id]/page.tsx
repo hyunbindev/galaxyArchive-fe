@@ -28,8 +28,8 @@ export default async function Page({ params }: { params: { id: string } }){
 
             <div className="flex-col">
                 <div className="w-full flex flex-col pt-10">
-                    <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth()+1}.${createAtDate.getDay()}`}</span>
-                    <h2 className="text-4xl bg-transparent">{article.title}</h2>
+                    <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth()+1}.${createAtDate.getDate()}`}</span>
+                    <h1 className="text-4xl bg-transparent">{article.title}</h1>
                     <div className="flex items-center gap-3 pt-4">
                         <Avatar className="h-8 w-8 border border-border/40">
                             <AvatarImage

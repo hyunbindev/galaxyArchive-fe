@@ -1,21 +1,19 @@
 "use client"
 import {RefObject, useEffect, useState} from "react";
 import api from "@/lib/api";
-import {useRouter} from "next/navigation";
 import {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
-import {blob} from "node:stream/consumers";
-
 
 
 export interface UploadStatus {
     uploadPhase:UploadPhase;
     imageStatus: Map<number,number>|null;
     errorMsg:string|null;
+    articleId:string|null;
 }
 export enum UploadPhase{
     IDLE = 'IDLE',
     IMAGE_UPLOAD = 'IMAGEUPLOAD',
-    TEXTUP_LOAD = 'TEXTUPLOAD',
+    TEXT_UPLOAD = 'TEXTUPLOAD',
     SUCCESS = 'SUCCESS',
     FAIL = 'FAIL',
 }
@@ -26,13 +24,13 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
     const [upLoadState, setUpLoadState] = useState<UploadStatus>({
         uploadPhase: UploadPhase.IDLE,
         imageStatus:null,
-        errorMsg:null
+        errorMsg:null,
+        articleId:null
     });
 
-    const router = useRouter()
 
     const getImageMapFromEditor=():Map<number,string>|undefined=>{
-        if(!ref.current) return;
+        if(!ref.current) return
         return ref.current.getImages();
     }
 
@@ -42,6 +40,7 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
     const uploadImage = async (pos:number,blobUrl:string)=>{
         try{
+            ref.current?.setReadOnly(true)
             const blobResponse = await fetch(blobUrl);
             const imageBlob = await blobResponse.blob();
 
@@ -56,7 +55,6 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     "X-Content-Length": imageBlob.size.toString(),
                 },
                 transformRequest: [(data) => data],
-                responseType: 'blob',
                 onUploadProgress:(progressEvent)=>{
                     const percent = Math.round(
                         (progressEvent.loaded * 100) / (progressEvent.total || imageBlob.size)
@@ -73,8 +71,16 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     });
                 }
             })
-            return response.data.url;
+            return response.data;
         }catch (e){
+            ref.current?.setReadOnly(false)
+            setUpLoadState(prev => ({
+                ...prev,
+                uploadPhase: UploadPhase.FAIL,
+                imageStatus:null,
+                errorMsg:null,
+                articleId:null
+            }));
             throw e
         }
     }
@@ -96,22 +102,23 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
                 for(const [pos,blobUrl] of articleImages){
                     const uploadedUrl = await uploadImage(pos,blobUrl);
-                    //TODO- replace node attrs url
-                    console.log(`${pos} : uploadedUrl`)
+                    if(!ref.current) return;
+                    ref.current.changeImageUrl(pos,uploadedUrl);
                 }
             }
 
-            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.TEXTUP_LOAD }));
+            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.TEXT_UPLOAD }));
+
+            if(!ref.current) return;
 
 
             const response =await api.post("/api/v1/articles",{
                 title:title,
-                text:text,
+                text:ref.current.getText(),
             })
 
-            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.SUCCESS }));
+            setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.SUCCESS,articleId:response.data }));
 
-            //router.replace(`/article/${response.data}`)
         }catch (err){
             console.error(err)
             setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.FAIL, }));

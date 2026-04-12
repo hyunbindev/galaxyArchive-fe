@@ -3,15 +3,14 @@
 import MilkdownEditor, {MilkdownEditorRef} from "@/components/editor/MilkdownEditor";
 import {Button} from "@/components/ui/button"
 import useCreateArticle, {UploadPhase} from "@/app/(main)/article/write/useCreateArticle";
-import {Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {useRef} from "react";
-import {Field, FieldLabel} from "@/components/ui/field";
-import {Progress} from "@/components/ui/progress";
+import UploadStatusModal from "@/app/(main)/article/write/UploadStatusModal";
 
 export default function WritePage(){
     const date = new Date();
     const editorRef = useRef<MilkdownEditorRef>(null);
     const {title, setTitle ,text, setText , publishArticle, upLoadState } = useCreateArticle(editorRef);
+
     return(
     <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
         <div className="flex-col">
@@ -27,13 +26,11 @@ export default function WritePage(){
                 />
             </div>
 
-            {/*<button onClick={()=>{console.log(editorRef.current?.getImages())}}>test btn</button>*/}
-
-            <div className="flex-1">
+            <div className="flex-1 mb-20 [&_.prose_*]:scroll-m-b-[5rem]">
                 <MilkdownEditor onChange={setText}  ref={editorRef}/>
             </div>
         </div>
-        <footer className="fixed bottom-0 left-0 w-full border-t border-border/50 bg-background">
+        <footer className="fixed bottom-0 left-0 h-20 w-full border-t border-border/50 bg-background">
             <div className="max-w-6xl mx-auto flex justify-between items-center py-5 w-full">
                 <div>{text.length.toLocaleString()} characters</div>
                 <div>
@@ -44,38 +41,7 @@ export default function WritePage(){
             </div>
         </footer>
 
-
-        {upLoadState.uploadPhase != UploadPhase.IDLE && <Dialog open={true}>
-            <DialogContent showCloseButton={false}>
-                <DialogHeader>
-                    <DialogTitle>GalaxyArchive</DialogTitle>
-                </DialogHeader>
-                    <DialogDescription className="text-gray-600">
-                        Launching Article to GalaxyArchive...
-                    </DialogDescription>
-
-                {upLoadState.imageStatus && Array.from(upLoadState.imageStatus).map(([_, percent]) => (
-
-                    <Field className="w-full text-gray-500">
-                        <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
-                            <span>Ready to launch image..</span>
-                            <span className="ml-auto">{percent}%</span>
-                        </FieldLabel>
-                        <Progress value={percent} id="progress-upload" />
-                    </Field>
-                ))}
-
-                <Field className="w-full text-gray-500">
-                    <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
-                        <span>Ready to launch article..</span>
-                        <span className="ml-auto">{upLoadState.uploadPhase == UploadPhase.SUCCESS ? 100 : 0}%</span>
-                    </FieldLabel>
-                    <Progress value={upLoadState.uploadPhase == UploadPhase.SUCCESS ? 100 : 0} id="progress-upload" />
-                </Field>
-
-                {upLoadState.uploadPhase == UploadPhase.SUCCESS && <div>성공ㅋ</div>}
-            </DialogContent>
-        </Dialog>}
+        {upLoadState.uploadPhase != UploadPhase.IDLE && <UploadStatusModal upLoadState={upLoadState}/>}
     </main>
     )
 }
