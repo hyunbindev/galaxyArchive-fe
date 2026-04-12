@@ -114,7 +114,7 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
             const response =await api.post("/api/v1/articles",{
                 title:title,
-                text:ref.current.getText(),
+                text:ref.current.getMarkdown(),
             })
 
             setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.SUCCESS,articleId:response.data }));

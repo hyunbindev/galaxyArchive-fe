@@ -13,7 +13,10 @@ export default async function middleware(request: NextRequest) {
 
     if (!session) {
         if (AUTHENTICATED_PATHS.some(path => pathname.startsWith(path))) {
-            return NextResponse.redirect(new URL('/login', request.url))
+            const loginUrl = new URL('/login',request.url)
+            loginUrl.searchParams.set('callbackUrl',pathname)
+
+            return NextResponse.redirect(loginUrl)
         }
         return NextResponse.next()
     }

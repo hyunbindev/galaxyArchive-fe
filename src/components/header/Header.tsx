@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button"
 import {getUser} from "@/components/header/getUser";
 import Link from "next/link";
+import UserDropDownMenu from "@/components/header/UserDropDownMenu";
 
 export async function Header() {
     const userInfo = await getUser();
@@ -21,10 +22,11 @@ export async function Header() {
                         <ThemeModeToggle />
                         {userInfo? (
                             <>
+                            <UserDropDownMenu/>
                             <Avatar className="h-8 w-8 border border-border/40">
                                 <AvatarImage
                                     src={userInfo.profileImageUrl}
-                                    alt="@shadcn"
+                                    alt="@profile image"
                                 />
                                 <AvatarFallback>CN</AvatarFallback>
                             </Avatar>

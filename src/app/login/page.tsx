@@ -1,10 +1,12 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
+import GalaxyBackground from "@/components/background/GalaxyBackground";
+
 
 export default function LoginPage(){
     return(
-        <div className="flex flex-col items-center justify-center h-screen bg-backgorund">
-            <Card className="w-full max-w-md bg-background">
+        <div className="flex flex-col items-center justify-center h-screen">
+            <Card className="w-full max-w-md bg-background z-99">
                 <CardHeader>
                     <CardTitle className="text-2xl">GalaxyArchive</CardTitle>
                     <CardDescription>지금 GalaxyArchive에서 당신만의 성좌를 그려보세요.</CardDescription>
@@ -22,6 +24,7 @@ export default function LoginPage(){
                     </Button>
                 </CardFooter>
             </Card>
+            <GalaxyBackground/>
         </div>
     )
 }

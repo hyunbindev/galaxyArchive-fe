@@ -15,7 +15,7 @@ interface Props{
 }
 export interface MilkdownEditorRef {
     getImages: () => Map<number,string>|undefined;
-    getText: ()=>string;
+    getMarkdown: ()=>string;
     changeImageUrl: (pos:number,url:string) => void;
     setReadOnly: (readOnly:boolean)=>void;
 }
@@ -58,7 +58,7 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                     view.dispatch(transaction)
                 })
             },
-            getText:():string=>{
+            getMarkdown:():string=>{
                 if (!crepeRef.current) return "";
                 return crepeRef.current.getMarkdown()
             },
