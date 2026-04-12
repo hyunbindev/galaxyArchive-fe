@@ -12,10 +12,9 @@ export default function WritePage(){
     const {title, setTitle ,text, setText , publishArticle, upLoadState } = useCreateArticle(editorRef);
 
     return(
-    <main className="max-w-4xl mx-auto bg-background min-h-full pb-20">
-        <div className="flex-col">
-
-            <div className="w-full flex flex-col pt-10">
+    <main className="max-w-4xl mx-auto bg-background min-h-full py-20" style={{"paddingTop":"5rem"}}>
+        <div className="flex flex-col">
+            <div className="w-full flex flex-col pt-10 mt-20">
                 <span className="text-gray-500">{date.getFullYear()}.{date.getMonth()+1}.{date.getDate()}</span>
                 <input
                     value={title}

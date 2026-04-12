@@ -15,12 +15,12 @@ export default function LoginPage(){
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
                     <a className="w-full" href={`${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/github`}>
-                    <Button className="w-full cursor-pointer">
-                        Join with GitHub
+                    <Button className="w-full">
+                        Get started with GitHub
                     </Button>
                     </a>
-                    <Button className="w-full cursor-pointer">
-                        Join with Google
+                    <Button className="w-full">
+                        Get started with Google
                     </Button>
                 </CardFooter>
             </Card>

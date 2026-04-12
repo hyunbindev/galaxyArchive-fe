@@ -8,7 +8,7 @@ import UserDropDownMenu from "@/components/header/UserDropDownMenu";
 export async function Header() {
     const userInfo = await getUser();
     return (
-        <header className="sticky top-0 h-15 w-full flex justify-center items-center p-2 bg-white dark:bg-background backdrop-blur-md z-50 border-b border-border/50">
+        <header className="fixed top-0 h-15 w-full flex justify-center items-center p-2 bg-white dark:bg-background backdrop-blur-md z-50 border-b border-border/50">
             <div className="w-full px-10 min-w-6xl mx-auto flex justify-between items-center">
                 <Link href="/">
                     <h1 className="font-bold text-lg text-foreground">galaxyArchive</h1>

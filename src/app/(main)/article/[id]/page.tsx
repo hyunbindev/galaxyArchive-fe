@@ -24,10 +24,9 @@ export default async function Page({ params }: { params: { id: string } }){
     const createAtDate:Date = new Date(article.createdAt)
 
     return(
-        <main className=" max-w-4xl mx-auto bg-background pb-20">
-
-            <div className="flex-col">
-                <div className="w-full flex flex-col pt-10">
+        <main className=" max-w-4xl mx-auto bg-background pb-20" style={{"paddingTop":"5rem"}}>
+            <div className="flex-col pt-10" >
+                <div className="w-full flex flex-col">
                     <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth()+1}.${createAtDate.getDate()}`}</span>
                     <h1 className="text-4xl bg-transparent">{article.title}</h1>
                     <div className="flex items-center gap-3 pt-4">
