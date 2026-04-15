@@ -1,10 +1,10 @@
-import GalaxyBackground from "@/components/background/GalaxyBackground";
+import ArticleGraphView from "@/components/view/ArticleGraphView";
 
 export default function Home() {
   return (
       <>
           <main>
-              <GalaxyBackground/>
+              <ArticleGraphView/>
           </main>
       </>
   );

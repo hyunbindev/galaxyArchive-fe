@@ -60,9 +60,9 @@ function Scene({ count = 300 }) {
     useFrame((_, delta) => {
         if (pointsRef.current && lineRef.current) {
             // 회전 동기화
-            pointsRef.current.rotation.y += delta * 0.02
-            pointsRef.current.rotation.x -= delta * 0.05
-            pointsRef.current.rotation.z += delta * 0.02
+            pointsRef.current.rotation.y += delta * 0.01
+            pointsRef.current.rotation.x -= delta * 0.02
+            pointsRef.current.rotation.z += delta * 0.03
 
 
             lineRef.current.rotation.copy(pointsRef.current.rotation)
@@ -96,7 +96,7 @@ function Scene({ count = 300 }) {
     return (
         <>
             <Points ref={pointsRef} positions={positions} colors={colors} stride={3}>
-                <PointMaterial size={0.35} vertexColors transparent opacity={1} sizeAttenuation depthWrite={true} />
+                <PointMaterial size={0.35} vertexColors transparent opacity={1} sizeAttenuation depthWrite={true} alphaTest={0.5}/>
             </Points>
 
             <lineSegments ref={lineRef}>

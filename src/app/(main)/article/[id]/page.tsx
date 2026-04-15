@@ -1,6 +1,6 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import MilkdownViewer from "@/components/viewer/MilkdownViewer";
+import MilkdownViewer from "@/components/view/MilkdownViewer";
 import getArticle, {Article} from "@/app/(main)/article/[id]/getArticle";
 import {notFound} from "next/dist/client/components/not-found";
 import DynamicSkeleton from "@/components/ui/DynamicSkeleton";
