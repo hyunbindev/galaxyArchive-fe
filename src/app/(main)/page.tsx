@@ -1,10 +1,10 @@
-import GalaxyNetwork from "@/app/test/page";
+import GalaxyBackground from "@/components/background/GalaxyBackground";
 
 export default function Home() {
   return (
       <>
           <main>
-              <GalaxyNetwork/>
+              <GalaxyBackground/>
           </main>
       </>
   );

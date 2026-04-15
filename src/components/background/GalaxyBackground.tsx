@@ -1,90 +1,117 @@
 "use client"
 
 import { useMemo, useRef } from "react"
-import {Canvas, useFrame, useThree} from "@react-three/fiber"
+import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
-import {PointMaterial} from "@react-three/drei";
-import {Bloom, EffectComposer} from "@react-three/postprocessing";
+import { PointMaterial, Points } from "@react-three/drei"
+import {Points as PointsImpl, Vector3} from 'three'
+function Scene({ count = 300 }) {
+    const pointsRef = useRef<PointsImpl>(null!)
+    const lineRef = useRef<THREE.LineSegments>(null!)
 
-function Scene({ count = 1000 }) {
-    const pointsRef = useRef<THREE.Points>(null!)
-    const { positions, colors } = useMemo(() => {
+    const { positions, colors, rawPositions } = useMemo(() => {
         const pos = new Float32Array(count * 3)
         const cols = new Float32Array(count * 3)
+        const raw:Vector3[] = []
+
+        const minDist = 1.5;
 
 
         for (let i = 0; i < count; i++) {
+            let x, y, z, isTooClose;
+            let attempts = 0;
 
-            const theta = Math.random() * Math.PI * 2;
-            const phi = Math.acos(2 * Math.random() - 1);
+            do {
+                isTooClose = false;
 
-            const distance = 4 + Math.random() * 15;
+                const theta = THREE.MathUtils.randFloat(0,2) * Math.PI * 2;
+                const phi = Math.acos(THREE.MathUtils.randFloat(0,2) - 1);
 
-
-            const x = Math.sin(phi) * Math.cos(theta) * distance;
-            const y = Math.sin(phi) * Math.sin(theta) * distance;
-            const z = Math.cos(phi) * distance;
-
-            const r = THREE.MathUtils.randFloat(0.4, 0.8)
-            const g = THREE.MathUtils.randFloat(0.4, 0.8)
-            const b = THREE.MathUtils.randFloat(0.4, 0.8)
+                const radius =THREE.MathUtils.randInt(2,20);
 
 
-            cols.set([r, g, b], i * 3)
+                x = Math.sin(phi) * Math.cos(theta) * radius;
+                y = Math.sin(phi) * Math.sin(theta) * radius;
+                z = Math.cos(phi) * radius;
 
-            pos.set([x, y, z], i * 3)
+                const minDistSq = minDist * minDist;
+                for (let j = 0; j < raw.length; j++) {
+                    const dx = raw[j].x - x;
+                    const dy = raw[j].y - y;
+                    const dz = raw[j].z - z;
+                    const distSq = dx * dx + dy * dy + dz * dz;
+
+                    if (distSq < minDistSq) {
+                        isTooClose = true;
+                        break;
+                    }
+                }
+                attempts++;
+            } while (isTooClose && attempts < 10);
+
+            pos.set([x, y, z], i * 3);
+            cols.set([1,1,1], i * 3);
+            raw.push(new THREE.Vector3(x, y, z));
         }
-        return {positions:pos , colors:cols}
-    }, [count])
-    const s = 0.02
-    useFrame((_, delta) => {
 
-        if (pointsRef.current) {
-            pointsRef.current.rotation.y += delta * s
-            pointsRef.current.rotation.x += delta * s
-            pointsRef.current.rotation.z += delta * s
+        return { positions: pos, colors: cols, rawPositions: raw }
+    }, [count])
+
+    useFrame((_, delta) => {
+        if (pointsRef.current && lineRef.current) {
+            // 회전 동기화
+            pointsRef.current.rotation.y += delta * 0.02
+            pointsRef.current.rotation.x -= delta * 0.05
+            pointsRef.current.rotation.z += delta * 0.02
+
+
+            lineRef.current.rotation.copy(pointsRef.current.rotation)
+
+            const lineIndices = []
+            const limitDistance=5.5
+
+            for (let i = 0; i < count; i++) {
+                let minDistance:number = Number.POSITIVE_INFINITY
+                let target:number|null = null
+                for (let j = i + 1; j < count; j++) {
+                    const dist = rawPositions[i].distanceTo(rawPositions[j])
+                    if (dist < minDistance && dist < limitDistance) {
+                        minDistance = dist
+                        target = j
+                    }
+                }
+                if(target){
+                    lineIndices.push(rawPositions[i].x, rawPositions[i].y, rawPositions[i].z)
+                    lineIndices.push(rawPositions[target].x, rawPositions[target].y, rawPositions[target].z)
+                }
+            }
+
+            lineRef.current.geometry.setAttribute(
+                'position',
+                new THREE.Float32BufferAttribute(lineIndices, 3)
+            )
         }
     })
 
     return (
-        <points ref={pointsRef}>
-            <bufferGeometry>
-                <bufferAttribute
-                    attach="attributes-position"
-                    count={positions.length / 3}
-                    array={positions}
-                    itemSize={3}
-                    args={[positions, 3]}
-                />
-                <bufferAttribute
-                    attach="attributes-color"
-                    count={colors.length / 3}
-                    array={colors}
-                    itemSize={3}
-                    args={[colors, 3]}
-                />
-            </bufferGeometry>
-            <PointMaterial
-                size={0.07}
-                vertexColors
-                sizeAttenuation={true}
-                transparent
-                opacity={1.0}
-                depthWrite={false}
-                blending={THREE.AdditiveBlending}
-            />
-        </points>
+        <>
+            <Points ref={pointsRef} positions={positions} colors={colors} stride={3}>
+                <PointMaterial size={0.35} vertexColors transparent opacity={1} sizeAttenuation depthWrite={true} />
+            </Points>
+
+            <lineSegments ref={lineRef}>
+                <bufferGeometry />
+                <lineBasicMaterial color="white" transparent opacity={0.15} depthWrite={false} />
+            </lineSegments>
+        </>
     )
 }
 
 export default function GalaxyBackground() {
     return (
-        <div className="fixed inset-0 -z-10 w-full h-full">
-            <Canvas camera={{ position: [0, 0, 0] }}>
+        <div className="fixed inset-0 -z-10 w-full h-full pointer-events-none" style={{ mixBlendMode: 'difference' }}>
+            <Canvas camera={{ position: [11, 11, 11], fov: 60 }}>
                 <Scene />
-                <EffectComposer>
-                    <Bloom luminanceThreshold={0} intensity={1.5} mipmapBlur />
-                </EffectComposer>
             </Canvas>
         </div>
     )

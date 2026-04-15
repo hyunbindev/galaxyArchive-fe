@@ -22,9 +22,9 @@ export default function UploadStatusModal({upLoadState}:Props){
                     Launching Article to GalaxyArchive...
                 </DialogDescription>
 
-                {upLoadState.imageStatus && Array.from(upLoadState.imageStatus).map(([_, percent]) => (
+                {upLoadState.imageStatus && Array.from(upLoadState.imageStatus).map(([pos, percent]) => (
 
-                    <Field className="w-full text-gray-500">
+                    <Field key={pos} className="w-full text-gray-500">
                         <FieldLabel className="text-xs font-light" htmlFor="progress-upload">
                             <span>{percent == 100 ? "Image launch complete!":"Launching image.."}</span>
                             <span className="ml-auto">{percent}%</span>
