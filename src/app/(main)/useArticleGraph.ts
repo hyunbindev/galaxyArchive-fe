@@ -1,23 +1,26 @@
 "use client"
 import {useEffect, useState} from "react";
-import {ArticleEdge} from "@/components/view/ArticleGraphView";
+import { ArticleGraph } from "@/components/view/ArticleGraphView";
 
 export default function useArticleGraph (){
-    const [edges,setEdge] = useState<ArticleEdge[]>([]);
+    const [graph,setGraph] = useState<ArticleGraph>();
 
     useEffect(()=>{
         const loadData = async () => {
             const res =  await getEdges();
-            setEdge(res);
+            setGraph(res);
         };
         loadData()
     },[])
 
     const getEdges = async()=>{
         const res = await fetch(`/api/v1/articles/graphs`);
-        const data: ArticleEdge[] = await res.json();
+        const data: ArticleGraph = await res.json();
+
+        console.log(data);
+
         return data;
     }
 
-    return { edges }
+    return { graph }
 }
