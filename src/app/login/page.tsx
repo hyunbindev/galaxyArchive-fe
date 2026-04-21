@@ -14,7 +14,7 @@ export default function LoginPage(){
                 <CardContent>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <a className="w-full" href={`${process.env.NEXT_PUBLIC_API_URL}/oauth2/authorization/github`}>
+                    <a className="w-full" href='/oauth2/authorization/github'>
                     <Button className="w-full">
                         Get started with GitHub
                     </Button>

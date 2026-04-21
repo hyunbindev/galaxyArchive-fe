@@ -22,7 +22,7 @@ export default async function middleware(request: NextRequest) {
     }
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/user/me`, {
+        const response = await fetch(`/api/v1/user/me`, {
             headers: { 'Cookie': `JSESSIONID=${session}` },
             cache: 'no-store',
             signal: AbortSignal.timeout(2000)

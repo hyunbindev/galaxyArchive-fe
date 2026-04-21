@@ -1,4 +1,15 @@
-FROM ubuntu:latest
-LABEL authors="wuwan"
+LABEL authors="wuwang"
+FROM node:20-alpine
+WORKDIR /app
 
-ENTRYPOINT ["top", "-b"]
+COPY package.json package-lock.json* ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
+EXPOSE 3000
+
+CMD ["npm", "start"]

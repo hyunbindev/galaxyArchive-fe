@@ -1,0 +1,10 @@
+services:
+  galaxy-archive-fe:
+    build:
+      context: . # Dockerfile이 있는 위치
+    container_name: galaxy-archive-fe
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - galaxy-network
