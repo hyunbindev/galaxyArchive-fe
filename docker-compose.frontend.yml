@@ -1,7 +1,6 @@
 services:
   galaxy-archive-fe:
-    build:
-      context: . # Dockerfile이 있는 위치
+    image: ghcr.io/${REPO_LOWER}/galaxy-archive-fe:latest
     container_name: galaxy-archive-fe
     restart: always
     ports:
