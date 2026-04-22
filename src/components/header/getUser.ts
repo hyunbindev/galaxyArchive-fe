@@ -17,10 +17,10 @@ export async function getUser(){
         return response.data;
     }catch(err){
         //AXIOS EXCEPTION HANDLER
-        if(axios.isAxiosError(err)){
-            const status = err.response?.status
-            if(status == 401) cookieStore.delete("JSESSIONID");
-        }
+        // if(axios.isAxiosError(err)){
+        //     const status = err.response?.status
+        //     if(status == 401) cookieStore.delete("JSESSIONID");
+        // }
         return null;
     }
 }

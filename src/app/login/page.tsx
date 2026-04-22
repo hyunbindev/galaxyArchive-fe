@@ -19,9 +19,11 @@ export default function LoginPage(){
                         Get started with GitHub
                     </Button>
                     </a>
+                    <a className="w-full" href='/oauth2/authorization/google'>
                     <Button className="w-full">
                         Get started with Google
                     </Button>
+                    </a>
                 </CardFooter>
             </Card>
             <GalaxyBackground/>

@@ -219,7 +219,7 @@ function Scene({ clusters, edges }: ArticleGraph) {
                 <Html
                     key={i}
                     position={[pos.x, pos.y + 0.6, pos.z]}
-                    distanceFactor={12}
+                    distanceFactor={ 12 }
                     style={{
                         pointerEvents: 'none',
                         color: 'white',
