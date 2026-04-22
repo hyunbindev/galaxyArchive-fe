@@ -3,8 +3,10 @@ services:
     image: ghcr.io/${REPO_LOWER}/galaxy-archive-fe:latest
     container_name: galaxy-archive-fe
     restart: always
-    ports:
-      - "3000:3000"
+    env_file:
+      - .front.env
+    environment:
+      - INTERNAL_API_URL=${INTERNAL_API_URL}
     networks:
       - galaxy-network
 
