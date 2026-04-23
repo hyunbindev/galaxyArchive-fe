@@ -1,6 +1,4 @@
 import {cookies} from "next/dist/server/request/cookies";
-import api from "@/lib/api";
-import axios from "axios";
 
 export async function getUser(){
     const cookieStore = await cookies()
@@ -9,18 +7,24 @@ export async function getUser(){
     if(!sessionId) return null;
 
     try{
-        const response = await api.get("/api/v1/users/me",{
+
+        const response = await fetch(`${process.env.INTERNAL_API_URL}/api/v1/users/me`,{
             headers:{
-                Cookie: `JSESSIONID=${sessionId}`,
-            },
-        });
-        return response.data;
+                'Cookie': `JSESSIONID=${sessionId}`,
+                'Content-Type': 'application/json'
+            }
+        })
+
+        if(!response.ok){
+            //TODO-예외처리
+            console.error(response)
+        }
+
+
+        return response.json();
     }catch(err){
-        //AXIOS EXCEPTION HANDLER
-        // if(axios.isAxiosError(err)){
-        //     const status = err.response?.status
-        //     if(status == 401) cookieStore.delete("JSESSIONID");
-        // }
+        //TODO-예외처리
+        console.error(err)
         return null;
     }
 }
