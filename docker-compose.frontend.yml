@@ -5,9 +5,6 @@ services:
     restart: always
     env_file:
       - .front.env
-    environment:
-      - INTERNAL_API_URL=${INTERNAL_API_URL}
-      - NEXT_PUBLIC_IMAGE_BASE_URL=${NEXT_PUBLIC_IMAGE_BASE_URL}
     networks:
       - galaxy-network
 
