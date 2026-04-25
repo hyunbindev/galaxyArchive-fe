@@ -8,12 +8,13 @@ export interface LightApiBuilder<T> extends Promise<T>{
     cookies(cookie: Record<string, string | number>): this;
     isCredentialRequest(value:boolean):this;
     params(param:Record<string, string|number>):this;
-    isDebugMode(val:booelan):this;
-    baseUrl(baseUrl:string):this;
+    isDebugMode(val:boolean):this;
+    baseUrl(baseUrl:string|undefined):this;
+    responseType(type:ResponseType):this;
 
     then<Response = T, Reject = never>(
-        onfulfilled?: ((value: T)=> TResult1 | PromiseLike<Response>) | null,
-        rejected?: ((reason: any) => TResult2 | PromiseLike<Reject>) | null
+        onfulfilled?: ((value: T)=> Response | PromiseLike<Response>) | null,
+        rejected?: ((reason: any) => Reject | PromiseLike<Reject>) | null
     ):Promise<Response|Reject>
 
     catch<Reject = never>(
@@ -23,7 +24,7 @@ export interface LightApiBuilder<T> extends Promise<T>{
     finally(fin?: (() => void) | null): Promise<T>;
 }
 
-interface LightApi {
+export interface LightApi {
     get<T=unknown>(url: string):LightApiBuilder<T>
     post<T=unknown>(url: string):LightApiBuilder<T>
     put<T=unknown>(url: string):LightApiBuilder<T>
@@ -39,16 +40,22 @@ export interface LightApiConfig {
     uri:string|null;
     isCredentialWith:boolean;
     isDebugMode:boolean;
+    responseType:ResponseType
 }
 
-export const Method = {
-    GET: 'GET',
-    POST: 'POST',
-    PUT: 'PUT',
-    PATCH: 'PATCH',
-    DELETE: 'DELETE',
-} as const;
 
 
-declare const LightApi: LightApi;
-export default api;
+export enum Method{
+    GET= 'GET',
+    POST= 'POST',
+    PUT= 'PUT',
+    PATCH= 'PATCH',
+    DELETE= 'DELETE',
+}
+
+export enum ResponseType{
+    TEXT = 'TEXT',
+    JSON = 'JSON',
+    BLOB = 'BLOB',
+    DEFAULT = 'DEFAULT'
+}

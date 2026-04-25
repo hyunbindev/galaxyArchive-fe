@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import apiClient, {lightApi} from "@/lib/ApiClient";
+import {notFound} from "next/dist/client/components/not-found";
+import {UserInfo} from "@/components/header/getUser";
 
 
 
@@ -11,31 +14,34 @@ export default async function middleware(request: NextRequest) {
     const session = request.cookies.get('JSESSIONID')?.value
     const { pathname } = request.nextUrl
 
-    if (!session) {
-        if (AUTHENTICATED_PATHS.some(path => pathname.startsWith(path))) {
-            const loginUrl = new URL('/login',request.url)
-            loginUrl.searchParams.set('callbackUrl',pathname)
+    const isProtectedPath = AUTHENTICATED_PATHS.some(path => pathname.startsWith(path))
 
+    if (!session) {
+        if (isProtectedPath) {
+            const loginUrl = new URL('/login', request.url)
+            loginUrl.searchParams.set('callbackUrl', pathname)
             return NextResponse.redirect(loginUrl)
         }
         return NextResponse.next()
     }
 
-    try {
-        const response = await fetch(`/api/v1/user/me`, {
-            headers: { 'Cookie': `JSESSIONID=${session}` },
-            cache: 'no-store',
-            signal: AbortSignal.timeout(2000)
-        })
+    if (isProtectedPath) {
+        try {
+            await lightApi.get('/api/v1/users/me')
+                .baseUrl(process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL)
+                .isCredentialRequest(true)
+                .cookies({ JSESSIONID: session })
 
-        if (response.status === 401) {
-            const res = NextResponse.next()
-            res.cookies.delete('JSESSIONID')
+            return NextResponse.next()
+        } catch (e: any) {
+            // 여기서 delete 하는 건 합법이다!
+            const loginUrl = new URL('/login', request.url)
+            loginUrl.searchParams.set('callbackUrl', pathname)
+
+            const res = NextResponse.redirect(loginUrl)
+            res.cookies.delete('JSESSIONID') // 미들웨어에선 이게 됨
             return res
         }
-    } catch (e) {
-        // 백엔드 서버 점검 중일 때를 대비한 예외 처리
-        return NextResponse.next()
     }
 
     return NextResponse.next()

@@ -1,4 +1,5 @@
 import {cookies} from "next/dist/server/request/cookies";
+import lightApi from "@/lib/ApiClient/index";
 
 export async function getUser(){
     const cookieStore = await cookies()
@@ -6,25 +7,18 @@ export async function getUser(){
 
     if(!sessionId) return null;
 
-    try{
+    return lightApi.get<UserInfo>('/api/v1/users/me')
+        .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL)
+        .isCredentialRequest(true)
+        .cookies({JSESSIONID: sessionId})
+        .catch((e)=>{ return null })
+}
 
-        const response = await fetch(`${process.env.INTERNAL_API_URL}/api/v1/users/me`,{
-            headers:{
-                'Cookie': `JSESSIONID=${sessionId}`,
-                'Content-Type': 'application/json'
-            }
-        })
-
-        if(!response.ok){
-            //TODO-예외처리
-            console.error(response)
-        }
-
-
-        return response.json();
-    }catch(err){
-        //TODO-예외처리
-        console.error(err)
-        return null;
-    }
+export interface UserInfo{
+    id:string;
+    nickName:string;
+    providerId:string;
+    email:string;
+    profileImageUrl:string;
+    oauth2Provider:string;
 }
