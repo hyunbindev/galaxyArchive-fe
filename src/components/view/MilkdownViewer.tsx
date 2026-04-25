@@ -37,7 +37,7 @@ export default function MilkdownViewer({ text }: Props) {
                 const instance = crepeRef.current;
                 crepeRef.current = null;
                 initializing.current = false;
-                instance.destroy();
+                instance.destroy().then(crepeRef.current=null);
             }
         };
     }, [text]);
