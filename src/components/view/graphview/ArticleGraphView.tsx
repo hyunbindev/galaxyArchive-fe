@@ -37,7 +37,7 @@ function Scene({ clusters, edges }: ArticleGraph) {
 
     const { nodePosition } = useGraphLayout({ clusters, edges })
 
-    const { positions, colors, rawPositions, titles } = useMemo(() => {
+    const { positions, colors, rawPositions, titles, nodeIds } = useMemo(() => {
         const posArray: number[] = [];
         const colorArray: number[] = [];
         const rawPos: THREE.Vector3[] = [];
@@ -45,6 +45,8 @@ function Scene({ clusters, edges }: ArticleGraph) {
 
         // 타이틀을 찾기 위한 맵핑 (edges에서 추출)
         const titleMap: Record<number, string> = {};
+        const nodeIds: number[] = [];
+
         edges.forEach(e => {
             titleMap[e.u] = e.u_title;
             titleMap[e.v] = e.v_title;
@@ -68,6 +70,8 @@ function Scene({ clusters, edges }: ArticleGraph) {
                     // Html 태그용 원본 객체 및 타이틀 저장
                     rawPos.push(pos);
                     titleArray.push(titleMap[nodeId] || `Node ${nodeId}`);
+
+                    nodeIds.push(nodeId)
                 }
             });
         });
@@ -76,7 +80,8 @@ function Scene({ clusters, edges }: ArticleGraph) {
             positions: new Float32Array(posArray),
             colors: new Float32Array(colorArray),
             rawPositions: rawPos,
-            titles: titleArray
+            titles: titleArray,
+            nodeIds: nodeIds
         };
     }, [clusters, nodePosition, edges]);
 
@@ -119,9 +124,8 @@ function Scene({ clusters, edges }: ArticleGraph) {
     const handleNodeClick = (index:number|undefined) =>{
         if(index === undefined || !pointsRef.current) return;
 
-
         if(lastSelectedIndex == index){
-            router.push(`/article/${index}`)
+            router.push(`/article/${nodeIds[index]}`)
             return;
         }
 

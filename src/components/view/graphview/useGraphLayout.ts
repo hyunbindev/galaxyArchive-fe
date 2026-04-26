@@ -120,7 +120,7 @@ export default function useGraphLayout({ clusters, edges }: ArticleGraph){
             const clusterEdges = edges.filter(e => nodeSet.has(e.u) && nodeSet.has(e.v));
 
             //척력및 인력 연산 반복
-            const iterations = 50;
+            const iterations = 20;
 
             for (let step = 0; step < iterations; step++) {
                 // [인력/척력 적용]
