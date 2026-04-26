@@ -2,13 +2,10 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import MilkdownViewer from "@/components/view/MilkdownViewer";
 import getArticle, {Article} from "@/app/(main)/article/[id]/getArticle";
-import {notFound} from "next/dist/client/components/not-found";
-import DynamicSkeleton from "@/components/ui/DynamicSkeleton";
 
-//TODO-1. JSON-LD(TechArticle) 주입,
+
 //TODO-2. remark-html로 sr-only 정적 HTML 매복,
 //TODO-3. dynamic loading에 스피너/스켈레톤 추가
-//TODO-4. any 타입 제거 및 PostData 인터페이스 정의
 
 export default async function Page({ params }: { params: { id: string } }){
     const { id } = await params;
@@ -16,15 +13,32 @@ export default async function Page({ params }: { params: { id: string } }){
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-        return notFound();
+        return new Error("not valid article id");
     }
 
     const article:Article = await getArticle(numericId)
 
     const createAtDate:Date = new Date(article.createdAt)
 
+    const jsonLd = {
+        "@context": "https://schema.org",
+        "@type": "BlogArticle",
+        "headline": article.title,
+        "datePublished": article.createdAt,
+        "author": {
+            "@type": "Person",
+            "name": article.author.nickName,
+            "image": article.author.profileImageUrl
+        },
+        "articleBody": article.text.substring(0, 200) // 초반 요약만
+    };
+
     return(
         <main className=" max-w-4xl mx-auto bg-background pb-20" style={{"paddingTop":"5rem"}}>
+            <script
+                type="application/ld+json"
+                dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+            />
             <div className="flex-col pt-10" >
                 <div className="w-full flex flex-col">
                     <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth()+1}.${createAtDate.getDate()}`}</span>
