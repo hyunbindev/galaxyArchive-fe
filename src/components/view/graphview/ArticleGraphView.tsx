@@ -6,6 +6,8 @@ import * as THREE from "three"
 import { PointMaterial, Points, OrbitControls, Html } from "@react-three/drei"
 import { Points as PointsImpl, Vector3 } from 'three'
 import useGraphLayout from "@/components/view/graphview/useGraphLayout";
+import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 
 export interface ArticleGraph {
@@ -23,9 +25,13 @@ export interface VectorEdge{
 
 
 function Scene({ clusters, edges }: ArticleGraph) {
+    const router = useRouter()
     const pointsRef = useRef<PointsImpl>(null!)
     const lineRef = useRef<THREE.LineSegments>(null!);
+
     const [focusPoint, setFocusPoint] = useState<THREE.Vector3 | null>(null);
+    const [lastSelectedIndex, setLastSelectedIndex] = useState<number | null>(null);
+
     const controlsRef = useRef<any>(null!);
 
 
@@ -91,12 +97,37 @@ function Scene({ clusters, edges }: ArticleGraph) {
         return new Float32Array(lineArray);
     }, [edges, nodePosition]);
 
+    //선택된 노드 색상 변경
+    useEffect(() => {
+        if (lastSelectedIndex !== null && pointsRef.current) {
+            const attr = pointsRef.current.geometry.attributes.color;
+
+            attr.setXYZ(lastSelectedIndex, 0.3, 0.9, 0.0);
+            attr.needsUpdate = true;
+        }
+
+        return () => {
+            if (lastSelectedIndex !== null && pointsRef.current) {
+                const attr = pointsRef.current.geometry.attributes.color;
+
+                attr.setXYZ(lastSelectedIndex, 1, 1, 1);
+                attr.needsUpdate = true;
+            }
+        };
+    }, [lastSelectedIndex, colors]);
+
     const handleNodeClick = (index:number|undefined) =>{
-        if(!index) {
+        if(index === undefined || !pointsRef.current) return;
+
+
+        if(lastSelectedIndex == index){
+            router.push(`/article/${index}`)
             return;
         }
+
+        setLastSelectedIndex(index);
+
         const targetNodePos = rawPositions[index];
-        console.log(targetNodePos);
         if(targetNodePos) setFocusPoint(targetNodePos.clone())
     }
 
@@ -156,10 +187,10 @@ function Scene({ clusters, edges }: ArticleGraph) {
                 <PointMaterial
                     size={0.6}
                     vertexColors
-                    transparent
+                    transparent={true}
                     sizeAttenuation
                     depthWrite={false}
-                    blending={THREE.AdditiveBlending}
+                    blending={THREE.NormalBlending}
                 />
             </Points>
 
