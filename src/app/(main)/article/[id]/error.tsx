@@ -28,7 +28,7 @@ export default function Error({ error, reset }: {
                     </CardContent>
                     <CardFooter className="flex-col items-start">
                         <CardDescription>
-                            <Link className="text-left" href="/">Back to galaxyArchive home.</Link>
+                            <Link className="text-right" href="/">Back to galaxyArchive home.</Link>
                         </CardDescription>
                     </CardFooter>
                 </Card>

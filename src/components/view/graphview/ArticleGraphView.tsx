@@ -1,11 +1,11 @@
 "use client"
 
-import { useMemo, useRef, useState } from "react"
+import {useEffect, useMemo, useRef, useState} from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { PointMaterial, Points, OrbitControls, Html } from "@react-three/drei"
 import { Points as PointsImpl, Vector3 } from 'three'
-import {edgeSandboxNextRequestContext} from "next/dist/server/web/sandbox/context";
+import useGraphLayout from "@/components/view/graphview/useGraphLayout";
 
 
 export interface ArticleGraph {
@@ -13,7 +13,7 @@ export interface ArticleGraph {
     edges: VectorEdge[];
 }
 
-interface VectorEdge{
+export interface VectorEdge{
     u_title: string;
     v_title: string;
     u: number;
@@ -25,108 +25,11 @@ interface VectorEdge{
 function Scene({ clusters, edges }: ArticleGraph) {
     const pointsRef = useRef<PointsImpl>(null!)
     const lineRef = useRef<THREE.LineSegments>(null!);
+    const [focusPoint, setFocusPoint] = useState<THREE.Vector3 | null>(null);
+    const controlsRef = useRef<any>(null!);
 
-    const { nodePosition } = useMemo(() => {
-        const clusterCenters: Record<string, THREE.Vector3> = {};
-        const nodePosition: Record<number, THREE.Vector3> = {};
 
-        const edgesMap: Record<number, VectorEdge> = {};
-        edges.forEach((edge) => {
-            edgesMap[edge.u] = edge;
-        });
-
-        const sortedClusters = Object.entries(clusters)
-            .sort((a, b) => b[1].length - a[1].length); // 내림차순 정렬
-
-        const totalClusters = sortedClusters.length;
-        const phi = Math.PI * (3 - Math.sqrt(5));
-
-        for (let i = 0; i < totalClusters; i++) {
-            const [clusterKeys, nodes] = sortedClusters[i];
-
-            if (i === 0) {
-                clusterCenters[clusterKeys] = new THREE.Vector3(0, 0, 0);
-            } else {
-                const radius = phi*totalClusters+10;
-                const divisor = totalClusters > 1 ? totalClusters - 1 : 1;
-                const y = 1 - (i / divisor) * 2;
-                const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
-                const theta = phi * i;
-
-                clusterCenters[clusterKeys] = new THREE.Vector3(
-                    Math.cos(theta) * radiusAtY * radius,
-                    y * radius,
-                    Math.sin(theta) * radiusAtY * radius
-                );
-            }
-
-            //성단 내부 노드 배치
-            const currentCenter = clusterCenters[clusterKeys];
-            const maxR = Math.sqrt(nodes.length) * 5;
-
-            for (const node of nodes) {
-                const u = Math.random() * 2 * Math.PI; // 0 ~ 360도
-                const v = Math.acos(2 * Math.random() - 1); // 위아래 구면 각도
-                const initR = maxR * Math.pow(Math.random(), 1 / 3);
-
-                nodePosition[node] = new THREE.Vector3(
-                    currentCenter.x + initR * Math.sin(v) * Math.cos(u),
-                    currentCenter.y + initR * Math.sin(v) * Math.sin(u),
-                    currentCenter.z + initR * Math.cos(v)
-                );
-            }
-
-            // 시뮬레이션 (Relaxation): 노드 간 가중치를 거리에 반영
-            const nodeSet = new Set(nodes);
-            // 현재 클러스터 내부에 속한 엣지들만 싹 다 긁어옴
-            const clusterEdges = edges.filter(e => nodeSet.has(e.u) && nodeSet.has(e.v));
-
-            //척력및 인력 연산 반복
-            const iterations = 50;
-
-            for (let step = 0; step < iterations; step++) {
-                // [인력/척력 적용]
-                for (const edge of clusterEdges) {
-                    const pU = nodePosition[edge.u];
-                    const pV = nodePosition[edge.v];
-                    if (!pU || !pV) continue;
-
-                    const delta = pV.clone().sub(pU);
-                    const currentDist = delta.length();
-                    if (currentDist === 0) continue;
-
-                    // 목표 거리 설정 (네 로직 응용: w에 비례 혹은 반비례)
-                    // 예시: w가 작을수록(유사도가 높을수록) 거리가 짧아짐
-                    const targetDist = (edge.w + 0.1) * (maxR * 0.4);
-
-                    // 목표 거리와의 오차만큼 서로를 끌어당기거나 밀어냄
-                    const force = (currentDist - targetDist) / currentDist;
-                    const correction = delta.multiplyScalar(force * 0.3); // 0.3은 텐션(탄성) 조절값
-
-                    pU.add(correction);
-                    pV.sub(correction);
-                }
-
-                // 성단(maxR) 밖으로 튕겨 나간 놈들 멱살 잡고 원대복귀
-                for (const node of nodes) {
-                    const pos = nodePosition[node];
-                    const offset = pos.clone().sub(currentCenter);
-                    const dist = offset.length();
-
-                    if (dist > maxR) {
-                        offset.setLength(maxR);
-                        nodePosition[node] = currentCenter.clone().add(offset);
-                    } else if (dist < 1) {
-                        // 중심부에 블랙홀처럼 너무 떡지는 것 방지
-                        offset.setLength(1);
-                        nodePosition[node] = currentCenter.clone().add(offset);
-                    }
-                }
-            }
-        }
-
-        return { clusterCenter: clusterCenters, nodePosition: nodePosition };
-    }, [clusters, edges]);
+    const { nodePosition } = useGraphLayout({ clusters, edges })
 
     const { positions, colors, rawPositions, titles } = useMemo(() => {
         const posArray: number[] = [];
@@ -188,6 +91,45 @@ function Scene({ clusters, edges }: ArticleGraph) {
         return new Float32Array(lineArray);
     }, [edges, nodePosition]);
 
+    const handleNodeClick = (index:number|undefined) =>{
+        if(!index) {
+            return;
+        }
+        const targetNodePos = rawPositions[index];
+        console.log(targetNodePos);
+        if(targetNodePos) setFocusPoint(targetNodePos.clone())
+    }
+
+    useFrame((state) => {
+        if (focusPoint) {
+            // 1. 현재 카메라와 타겟 사이의 거리(오프셋)를 계산
+            // 사용자가 보고 있던 각도를 그대로 유지하기 위함
+            const currentOffset = new THREE.Vector3().subVectors(
+                state.camera.position,
+                controlsRef.current.target
+            );
+
+            // 2. 새로운 카메라 목표 위치 = 클릭한 노드 좌표 + 기존 오프셋
+            const targetCamPos = new THREE.Vector3().addVectors(focusPoint, currentOffset);
+
+            const distance = state.camera.position.distanceTo(targetCamPos);
+
+            if (distance > 0.05) {
+                // 카메라 위치만 부드럽게 이동 (회전 발생 안 함)
+                state.camera.position.lerp(targetCamPos, 0.1);
+                // 컨트롤 타겟도 노드 위치로 부드럽게 이동
+                controlsRef.current.target.lerp(focusPoint, 0.1);
+            } else {
+                // 도착 시 상태 해제
+                setFocusPoint(null);
+            }
+        }
+
+        if (controlsRef.current) {
+            controlsRef.current.update();
+        }
+    });
+
     return (
         <>
             <OrbitControls
@@ -196,7 +138,9 @@ function Scene({ clusters, edges }: ArticleGraph) {
                 dampingFactor={0.05}
 
                 maxDistance={500}
-                minDistance={10}
+                minDistance={5}
+
+                ref={controlsRef}
             />
 
             <Points
@@ -204,6 +148,10 @@ function Scene({ clusters, edges }: ArticleGraph) {
                 positions={positions}
                 colors={colors}
                 stride={3}
+                onPointerDown={(e)=>{
+                    e.stopPropagation()
+                    handleNodeClick(e.index)
+                }}
             >
                 <PointMaterial
                     size={0.6}
@@ -264,7 +212,7 @@ export default function ArticleGraphView({ graph }: Props) {
 
     return (
         <div className="fixed inset-0 -z-10 w-full h-full" style={{ mixBlendMode: 'difference' }}>
-            <Canvas camera={{ position: [0, 0, 150], fov: 60 }}>
+            <Canvas camera={{ position: [0, 0, 10], fov: 60 }}>
                 <Scene {...graph} />
             </Canvas>
         </div>
