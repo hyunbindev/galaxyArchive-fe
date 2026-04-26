@@ -53,7 +53,7 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                     const {tr} = view.state;
 
                     const transaction = tr.setNodeMarkup(pos, undefined, {
-                        src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL?process.env.NEXT_PUBLIC_IMAGE_BASE_URL:""}/${url}`,
+                        src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL?process.env.NEXT_PUBLIC_IMAGE_BASE_URL:""}/image/${url}`,
                     })
                     view.dispatch(transaction)
                 })
