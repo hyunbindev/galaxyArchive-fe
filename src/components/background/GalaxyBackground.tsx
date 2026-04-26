@@ -5,7 +5,7 @@ import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { PointMaterial, Points } from "@react-three/drei"
 import {Points as PointsImpl, Vector3} from 'three'
-function Scene({ count = 300 }) {
+function Scene({ count = 160 }) {
     const pointsRef = useRef<PointsImpl>(null!)
     const lineRef = useRef<THREE.LineSegments>(null!)
 

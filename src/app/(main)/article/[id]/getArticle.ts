@@ -1,4 +1,5 @@
 import apiClient from "@/lib/ApiClient";
+import {notFound} from "next/dist/client/components/not-found";
 
 export default async function getArticle(articleId:number):Promise<Article>{
     return apiClient.get<Article>(`/api/v1/articles/${articleId}`)

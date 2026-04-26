@@ -1,4 +1,5 @@
 import {Header} from "@/components/header/Header";
+import GalaxyBackground from "@/components/background/GalaxyBackground";
 
 
 export default function RootLayout({
@@ -10,6 +11,7 @@ export default function RootLayout({
       <>
         <Header/>
         {children}
+        <GalaxyBackground/>
       </>
   );
 }

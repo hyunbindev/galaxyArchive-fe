@@ -1,6 +1,5 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
-import GalaxyBackground from "@/components/background/GalaxyBackground";
 
 
 export default function LoginPage(){
@@ -26,7 +25,6 @@ export default function LoginPage(){
                     </a>
                 </CardFooter>
             </Card>
-            <GalaxyBackground/>
         </div>
     )
 }
