@@ -13,7 +13,7 @@ export default async function Page({ params }: { params: { id: string } }){
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
-        return new Error("not valid article id");
+        throw new Error("not valid article id");
     }
 
     const article:Article = await getArticle(numericId)
