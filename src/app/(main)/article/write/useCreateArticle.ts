@@ -10,6 +10,7 @@ export interface UploadStatus {
     errorMsg:string|null;
     articleId:string|null;
 }
+
 export enum UploadPhase{
     IDLE = 'IDLE',
     IMAGE_UPLOAD = 'IMAGEUPLOAD',
@@ -17,6 +18,12 @@ export enum UploadPhase{
     SUCCESS = 'SUCCESS',
     FAIL = 'FAIL',
 }
+
+export interface UploadImageResponse {
+    imageRawKey:string;
+    imageUUID:string;
+}
+
 export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
     const [title, setTitle] = useState<string>('');
     const [text, setText] = useState<string>('');
@@ -48,7 +55,7 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
 
             if(mimeType.length==0) ensureValidMimeType("잘못된 이미지 입니다")
 
-            const response = await api.post("/api/v1/articles/images", imageBlob,{
+            const response = await api.post<UploadImageResponse>("/api/v1/articles/images", imageBlob,{
                 headers: {
                     "Content-Type": "application/octet-stream",
                     "X-Content-Type": mimeType,
@@ -71,7 +78,11 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     });
                 }
             })
-            return response.data;
+            console.log(response)
+
+
+            return response.data
+
         }catch (e){
             ref.current?.setReadOnly(false)
             setUpLoadState(prev => ({
@@ -89,6 +100,9 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
         try {
             const articleImages = getImageMapFromEditor();
 
+
+            const uploadedUuids: string[] = [];
+
             if (articleImages) {
                 const imageStatusMap = new Map();
 
@@ -101,9 +115,13 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                 }));
 
                 for(const [pos,blobUrl] of articleImages){
-                    const uploadedUrl = await uploadImage(pos,blobUrl);
+                    const { imageRawKey, imageUUID } = await uploadImage(pos,blobUrl);
                     if(!ref.current) return;
-                    ref.current.changeImageUrl(pos,uploadedUrl);
+
+                    console.log(imageRawKey)
+
+                    ref.current.changeImageUrl(pos,imageRawKey);
+                    uploadedUuids.push(imageUUID)
                 }
             }
 
@@ -112,9 +130,11 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
             if(!ref.current) return;
 
 
-            const response =await api.post("/api/v1/articles",{
+            const response = await api.post("/api/v1/articles",{
                 title:title,
                 text:ref.current.getMarkdown(),
+                rawText:ref.current.getRawText(),
+                imageUuids:uploadedUuids
             })
 
             setUpLoadState(prev => ({ ...prev, uploadPhase: UploadPhase.SUCCESS,articleId:response.data }));

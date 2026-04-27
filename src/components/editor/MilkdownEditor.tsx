@@ -18,6 +18,7 @@ export interface MilkdownEditorRef {
     getMarkdown: ()=>string;
     changeImageUrl: (pos:number,url:string) => void;
     setReadOnly: (readOnly:boolean)=>void;
+    getRawText: ()=>string;
 }
 
 const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
@@ -51,9 +52,9 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                 editor.action((ctx)=>{
                     const view = ctx.get(editorViewCtx);
                     const {tr} = view.state;
-
+                    console.log(url)
                     const transaction = tr.setNodeMarkup(pos, undefined, {
-                        src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL?process.env.NEXT_PUBLIC_IMAGE_BASE_URL:""}/image/${url}`,
+                        src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL?process.env.NEXT_PUBLIC_IMAGE_BASE_URL:"/image/"}/${url}`,
                     })
                     view.dispatch(transaction)
                 })
@@ -71,6 +72,15 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                         editable: () => !readOnly
                     });
                 });
+            },
+            getRawText:()=>{
+                if(!crepeRef.current) return "";
+                const { editor } = crepeRef.current;
+
+                return editor.action((ctx) => {
+                    const view = ctx.get(editorViewCtx);
+                    return view.state.doc.textContent;
+                })
             }
         }));
 
