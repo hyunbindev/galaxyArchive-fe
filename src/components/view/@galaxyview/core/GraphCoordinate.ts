@@ -136,6 +136,12 @@ export const GraphCoordinate = (
             nodePosition[cluster.name][rootNode] = { ...clusterCenters[cluster.name] }
             visited.add(rootNode)
 
+            const rootChildren = adjList[rootNode];
+            rootChildren.forEach((child, i)=>{
+                const edgeKey:string = [rootNode, child].sort().join('-');
+                const w = edgeWeights[edgeKey] ?? 0.5;
+
+            })
         })
     }
 }
