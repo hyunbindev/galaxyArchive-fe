@@ -1,10 +1,9 @@
 "use client";
 
-import React, {forwardRef, useEffect, useImperativeHandle, useRef, useState} from "react";
-import {Crepe, CrepeFeature} from "@milkdown/crepe";
+import React, {forwardRef, useEffect, useImperativeHandle, useRef } from "react";
+import { Crepe } from "@milkdown/crepe";
 import { listenerCtx } from '@milkdown/plugin-listener';
-import {editorViewCtx, editorViewOptionsCtx, serializerCtx} from '@milkdown/kit/core';
-import { nodesCtx } from '@milkdown/core';
+import {editorViewCtx, editorViewOptionsCtx } from '@milkdown/kit/core';
 import "@milkdown/crepe/theme/frame-dark.css";
 import "@milkdown/crepe/theme/common/style.css";
 import "@milkdown/crepe/theme/frame.css";
@@ -96,14 +95,14 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
             },
         });
 
-        if (!editorRef.current && crepeRef.current) return;
-        crepeRef.current=crepe
+            if (!editorRef.current && crepeRef.current) return;
+            crepeRef.current=crepe
 
-        const { editor } = crepe;
+            const { editor } = crepe;
 
 
-        editor.config((ctx) => {
-            ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
+            editor.config((ctx) => {
+                ctx.get(listenerCtx).markdownUpdated((ctx, markdown, prevMarkdown) => {
                 props.onChange?.(markdown);
             });
             ctx.update(editorViewOptionsCtx, (prev) => ({
