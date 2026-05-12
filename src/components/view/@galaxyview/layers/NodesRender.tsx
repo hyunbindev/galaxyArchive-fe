@@ -1,3 +1,4 @@
+"use client"
 import {Node} from "@/components/view/@galaxyview/types";
 import {useEffect, useMemo, useRef} from "react";
 
@@ -11,31 +12,41 @@ interface NodesProps{
 export function NodesRender({nodes, nodeColor}:NodesProps){
     const meshRef = useRef<THREE.InstancedMesh>(null!);
 
-    useEffect(()=>{
+    useEffect(() => {
         const mesh = meshRef.current;
+        if (!mesh) return;
+
         const dummy = new THREE.Object3D();
 
-        nodes.forEach(({id,title,position},i)=>{
-            if(!position) return;
+        let index = 0;
 
-            dummy.position.set(position.x, position.y, position.z);
+        nodes.forEach((node) => {
+            console.log(node);
+            if (!node.position) return;
+
+            dummy.position.set(
+                node.position.x,
+                node.position.y,
+                node.position.z
+            );
+
             dummy.updateMatrix();
 
-            mesh.setMatrixAt(i,dummy.matrix);
+            mesh.setMatrixAt(index, dummy.matrix);
 
-            mesh.setColorAt(i, nodeColor || new THREE.Color("white"));
+            index++;
         });
 
+        mesh.count = index;
+
         mesh.instanceMatrix.needsUpdate = true;
-        if(mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    },[nodes]);
+        if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
+    }, [nodes, nodeColor]);
 
     return(
         <instancedMesh
             ref={meshRef}
-            args={[undefined, undefined, nodes.length]}
-        >
-            <sphereGeometry args={[0.3, 8, 8]}/>
-        </instancedMesh>
+            args={[new THREE.SphereGeometry(1, 32, 32), new THREE.MeshBasicMaterial({ color: nodeColor }), nodes.length]}
+        />
     )
 }

@@ -32,10 +32,12 @@ export const GraphCoordinate = ({ clusters, edges }: Graph) => {
     const getClusterNormalizedVector = (): Record<string, Point3D> => {
         const clusterPosition: Record<string, Point3D> = {};
         const count = sortedCluster.length;
+
         sortedCluster.forEach((cluster, index) => {
             const y = count > 1 ? 1 - (index / (count - 1)) * 2 : 0;
             const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
             const theta = GOLDEN_RADIUS * index;
+
             clusterPosition[cluster.name] = normalize({
                 x: Math.cos(theta) * radiusAtY,
                 y: y,
@@ -77,6 +79,7 @@ export const GraphCoordinate = ({ clusters, edges }: Graph) => {
                     const sol = (-b + Math.sqrt(discriminant)) / 2;
                     distance = Math.max(distance, sol);
                 }
+
             }
             centers[name] = multiplyScalar(vector, distance);
         });

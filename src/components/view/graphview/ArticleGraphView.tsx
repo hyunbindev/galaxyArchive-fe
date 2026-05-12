@@ -4,9 +4,10 @@ import {useEffect, useMemo, useRef, useState} from "react"
 import { Canvas, useFrame } from "@react-three/fiber"
 import * as THREE from "three"
 import { PointMaterial, Points, OrbitControls, Html } from "@react-three/drei"
-import { Points as PointsImpl, Vector3 } from 'three'
+import { Points as PointsImpl } from 'three'
+
 import useGraphLayout from "@/components/view/graphview/useGraphLayout";
-import Link from "next/link";
+
 import {useRouter} from "next/navigation";
 
 

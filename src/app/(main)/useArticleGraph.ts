@@ -17,6 +17,8 @@ export default function useArticleGraph (){
         const res = await fetch(`/api/v1/articles/graphs`);
         const data: ArticleGraph = await res.json();
 
+        console.log(data);
+
         return data;
     }
 
