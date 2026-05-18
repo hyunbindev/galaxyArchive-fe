@@ -2,8 +2,8 @@ import * as Three from 'three'
 
 
 export const ZERO_POINT:Point3D = { x:0, y: 0,z:0 }
-export const CLUSTER_SCALE_SCALA = 1;
-export const CLUSTER_MARGIN = 5;
+export const CLUSTER_SCALE_SCALA = 1200;
+export const CLUSTER_MARGIN = 50;
 export const GOLDEN_RADIUS = Math.PI * (3- Math.sqrt(5));
 
 

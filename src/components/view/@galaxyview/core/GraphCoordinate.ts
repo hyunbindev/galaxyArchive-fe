@@ -4,174 +4,281 @@ import {
     Edge,
     GOLDEN_RADIUS,
     Graph,
-    Point3D, ZERO_POINT
+    Point3D,
+    ZERO_POINT
 } from "@/components/view/@galaxyview/types";
 
-const normalize = (point:Point3D)=>{
-    const length = Math.sqrt(point.x **2 + point.y**2 + point.z **2);
-    return length === 0 ? { x: 0, y: 0, z: 0 } : { x: point.x / length, y: point.y / length, z: point.z / length };
-}
+const normalize = (p: Point3D): Point3D => {
+    const len = Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z);
+    return len === 0
+        ? { x: 0, y: 0, z: 0 } : { x: p.x / len, y: p.y / len, z: p.z / len };
+};
 
-const multiplyScalar = (p:Point3D, s:number):Point3D =>{
-    return {x:p.x*s, y:p.y*s, z:p.z*s};
-}
+const multiplyScalar = (p: Point3D, s: number): Point3D => ({
+    x: p.x * s,
+    y: p.y * s,
+    z: p.z * s
+});
 
 export const GraphCoordinate = ({ clusters, edges }: Graph) => {
     const clusterCenters: Record<string, Point3D> = {};
     const clusterRadius: Record<string, number> = {};
     const nodePoint: Record<number, Point3D> = {};
+    const nodeToClusterName: Record<number, string> = {};
 
-    const sortedCluster = clusters.sort((a, b) => b.nodeIds.length - a.nodeIds.length);
+    const sortedCluster = [...clusters].sort(
+        (a, b) => b.nodeIds.length - a.nodeIds.length
+    );
 
-    //  각 클러스터의 반지름 미리 계산
-    sortedCluster.forEach((cluster) => {
-        clusterRadius[cluster.name] = Math.sqrt(cluster.nodeIds.length) * CLUSTER_SCALE_SCALA + CLUSTER_MARGIN;
+    // -----------------------------
+    // cluster radius
+    // -----------------------------
+    sortedCluster.forEach((c) => {
+        clusterRadius[c.name] =
+            Math.sqrt(c.nodeIds.length) * CLUSTER_SCALE_SCALA +
+            CLUSTER_MARGIN;
     });
 
-    //  클러스터 센터 배치를 위한 정규화 벡터 계산
-    const getClusterNormalizedVector = (): Record<string, Point3D> => {
-        const clusterPosition: Record<string, Point3D> = {};
-        const count = sortedCluster.length;
+    // -----------------------------
+    // direction
+    // -----------------------------
+    const getDirs = () => {
+        const res: Record<string, Point3D> = {};
+        const n = sortedCluster.length;
 
-        sortedCluster.forEach((cluster, index) => {
-            const y = count > 1 ? 1 - (index / (count - 1)) * 2 : 0;
-            const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
-            const theta = GOLDEN_RADIUS * index;
+        sortedCluster.forEach((c, i) => {
+            const y = n > 1 ? 1 - (i / (n - 1)) * 2 : 0;
+            const r = Math.sqrt(Math.max(0, 1 - y * y));
+            const theta = GOLDEN_RADIUS * i * 0.1;
 
-            clusterPosition[cluster.name] = normalize({
-                x: Math.cos(theta) * radiusAtY,
-                y: y,
-                z: Math.sin(theta) * radiusAtY
+            res[c.name] = normalize({
+                x: Math.cos(theta) * r,
+                y,
+                z: Math.sin(theta) * r
             });
         });
-        return clusterPosition;
+
+        return res;
     };
 
-    //  충돌을 방지하며 클러스터 중심점 확정
-    const getClusterCenterFromNormalizedVector = (normalizedVectors: Record<string, Point3D>): Record<string, Point3D> => {
+    // -----------------------------
+    // cluster centers
+    // -----------------------------
+    const getCenters = (dirs: Record<string, Point3D>) => {
         const centers: Record<string, Point3D> = {};
-        const clusterNames = Object.keys(normalizedVectors);
-        const centralClusterName = clusterNames[0];
+        const base = sortedCluster[0].name;
 
-        clusterNames.forEach((name, index) => {
-            if (index === 0) {
+        sortedCluster.forEach((c, i) => {
+            const name = c.name;
+
+            if (i === 0) {
                 centers[name] = { ...ZERO_POINT };
                 return;
             }
 
-            const vector = normalizedVectors[name];
-            let distance = clusterRadius[centralClusterName] + clusterRadius[name] + CLUSTER_MARGIN;
+            const dir = dirs[name];
 
-            for (let i = 1; i < index; i++) {
-                const prevName = clusterNames[i];
-                const prevCenter = centers[prevName];
-                const prevRadius = clusterRadius[prevName];
-                const minDistance = clusterRadius[name] + prevRadius + CLUSTER_MARGIN;
+            let dist =
+                clusterRadius[base] +
+                clusterRadius[name] +
+                CLUSTER_MARGIN;
 
-                const preDistance = Math.sqrt(prevCenter.x ** 2 + prevCenter.y ** 2 + prevCenter.z ** 2);
-                const cosTheta = (vector.x * prevCenter.x + vector.y * prevCenter.y + vector.z * prevCenter.z) / (preDistance || 1);
+            for (let j = 0; j < i; j++) {
+                const prev = sortedCluster[j].name;
+                const prevCenter = centers[prev];
 
-                const b = -2 * preDistance * cosTheta;
-                const c = preDistance ** 2 - minDistance ** 2;
-                const discriminant = b ** 2 - 4 * c;
+                const minDist =
+                    clusterRadius[name] +
+                    clusterRadius[prev] +
+                    CLUSTER_MARGIN;
 
-                if (discriminant >= 0) {
-                    const sol = (-b + Math.sqrt(discriminant)) / 2;
-                    distance = Math.max(distance, sol);
+                const len = Math.sqrt(
+                    prevCenter.x ** 2 +
+                    prevCenter.y ** 2 +
+                    prevCenter.z ** 2
+                );
+
+                const cos =
+                    (dir.x * prevCenter.x +
+                        dir.y * prevCenter.y +
+                        dir.z * prevCenter.z) /
+                    (len || 1);
+
+                const b = -2 * len * cos;
+                const c = len * len - minDist * minDist;
+                const d = b * b - 4 * c;
+
+                if (d >= 0) {
+                    const sol = (-b + Math.sqrt(d)) / 2;
+                    dist = Math.max(dist, sol);
                 }
-
             }
-            centers[name] = multiplyScalar(vector, distance);
+
+            centers[name] = multiplyScalar(dir, dist);
         });
+
         return centers;
     };
 
-    //  노드 배치 실행
-    const getNodePosition = () => {
-        sortedCluster.forEach((cluster) => {
-            const center = clusterCenters[cluster.name];
-            const clusterNodeSet = new Set(cluster.nodeIds);
-            const clusterEdges = edges.filter(edge => clusterNodeSet.has(edge.u) && clusterNodeSet.has(edge.v));
+    const centers = getCenters(getDirs());
+    Object.assign(clusterCenters, centers);
 
-            const adjList: Record<number, number[]> = {};
-            cluster.nodeIds.forEach(id => adjList[id] = []); // adjList 초기화
-            clusterEdges.forEach(edge => {
-                adjList[edge.u].push(edge.v);
-                adjList[edge.v].push(edge.u);
-            });
+    // -----------------------------
+    // 4. init nodes (radius 반영)
+    // -----------------------------
+    const init = () => {
+        const all: number[] = [];
+        const nodeToCenter: Record<number, Point3D> = {};
 
-            const rootNode = cluster.nodeIds.reduce((maxNode, node) =>
-                (adjList[node].length > (adjList[maxNode]?.length || 0)) ? node : maxNode, cluster.nodeIds[0]
-            );
+        sortedCluster.forEach((c) => {
+            const center = clusterCenters[c.name];
+            const radius = clusterRadius[c.name];
 
-            const visited = new Set<number>();
-            const depthMap: Record<number, number> = {};
-            const queue: number[] = [rootNode];
-            const nodesByDepth: Record<number, number[]> = {};
+            c.nodeIds.forEach((id) => {
+                all.push(id);
+                nodeToCenter[id] = center;
+                nodeToClusterName[id] = c.name;
 
-            visited.add(rootNode);
-            depthMap[rootNode] = 0;
-
-            let head = 0;
-            let maxDepth = 0;
-            while (head < queue.length) {
-                const currId = queue[head++];
-                const currDepth = depthMap[currId];
-                maxDepth = Math.max(maxDepth, currDepth);
-
-                if (!nodesByDepth[currDepth]) nodesByDepth[currDepth] = [];
-                nodesByDepth[currDepth].push(currId);
-
-                adjList[currId].forEach(neighbor => {
-                    if (!visited.has(neighbor)) {
-                        visited.add(neighbor);
-                        depthMap[neighbor] = currDepth + 1;
-                        queue.push(neighbor);
-                    }
-                });
-            }
-
-            for (let d = 0; d <= maxDepth; d++) {
-                const depthNodes = nodesByDepth[d];
-                const n = depthNodes.length;
-                const shellRadius = d === 0 ? 0 : (clusterRadius[cluster.name] - CLUSTER_MARGIN) * Math.pow(d / maxDepth, 0.5);
-
-                depthNodes.forEach((id, i) => {
-                    if (d === 0) {
-                        nodePoint[id] = { ...center };
-                        return;
-                    }
-                    const y = n > 1 ? 1 - (i / (n - 1)) * 2 : 0;
-                    const radiusAtY = Math.sqrt(Math.max(0, 1 - y * y));
-                    const theta = GOLDEN_RADIUS * i;
-
-                    nodePoint[id] = {
-                        x: center.x + Math.cos(theta) * radiusAtY * shellRadius,
-                        y: center.y + y * shellRadius,
-                        z: center.z + Math.sin(theta) * radiusAtY * shellRadius
-                    };
-                });
-            }
-
-            // 고립 노드 처리
-            cluster.nodeIds.forEach(id => {
-                if (!visited.has(id)) {
-                    const t = GOLDEN_RADIUS * id;
-                    const r = (clusterRadius[cluster.name] - CLUSTER_MARGIN) * 0.9;
-                    nodePoint[id] = {
-                        x: center.x + Math.cos(t) * r,
-                        y: center.y + (Math.random() - 0.5) * r * 0.2,
-                        z: center.z + Math.sin(t) * r
-                    };
-                }
+                nodePoint[id] = {
+                    x: center.x + (Math.random() - 0.5) * radius,
+                    y: center.y + (Math.random() - 0.5) * radius,
+                    z: center.z + (Math.random() - 0.5) * radius
+                };
             });
         });
 
-        return nodePoint;
+        return { all, nodeToCenter };
     };
 
-    const normalizedVectors = getClusterNormalizedVector();
-    Object.assign(clusterCenters, getClusterCenterFromNormalizedVector(normalizedVectors));
+    const { all: ALL_NODES, nodeToCenter } = init();
 
-    return getNodePosition();
+    // -----------------------------
+    // 5. physics constants
+    // -----------------------------
+    const ITERATIONS = 120;
+    const REPULSION_STRENGTH = 3000;
+    const ATTRACTION_STRENGTH = 0.05;
+    const BASE_CENTER_GRAVITY = 0.02;
+    const FRICTION = 0.78;
+
+    const MIN_DIST = 10;
+
+    const velocities: Record<number, Point3D> = {};
+    ALL_NODES.forEach((id) => {
+        velocities[id] = { x: 0, y: 0, z: 0 };
+    });
+
+    // -----------------------------
+    // 6. simulation
+    // -----------------------------
+    for (let step = 0; step < ITERATIONS; step++) {
+        const forces: Record<number, Point3D> = {};
+        ALL_NODES.forEach((id) => {
+            forces[id] = { x: 0, y: 0, z: 0 };
+        });
+
+        // A. repulsion
+        for (let i = 0; i < ALL_NODES.length; i++) {
+            for (let j = i + 1; j < ALL_NODES.length; j++) {
+                const u = ALL_NODES[i];
+                const v = ALL_NODES[j];
+
+                const dx = nodePoint[u].x - nodePoint[v].x;
+                const dy = nodePoint[u].y - nodePoint[v].y;
+                const dz = nodePoint[u].z - nodePoint[v].z;
+
+                const distSq = dx * dx + dy * dy + dz * dz || 0.01;
+                const dist = Math.sqrt(distSq);
+
+                const force = REPULSION_STRENGTH / distSq;
+
+                const fx = (dx / dist) * force;
+                const fy = (dy / dist) * force;
+                const fz = (dz / dist) * force;
+
+                forces[u].x += fx;
+                forces[u].y += fy;
+                forces[u].z += fz;
+
+                forces[v].x -= fx;
+                forces[v].y -= fy;
+                forces[v].z -= fz;
+
+                if (dist < MIN_DIST && dist > 0.00001) {
+                    const overlap = (MIN_DIST - dist) * 0.5;
+
+                    const nx = dx / dist;
+                    const ny = dy / dist;
+                    const nz = dz / dist;
+
+                    nodePoint[u].x += nx * overlap;
+                    nodePoint[u].y += ny * overlap;
+                    nodePoint[u].z += nz * overlap;
+
+                    nodePoint[v].x -= nx * overlap;
+                    nodePoint[v].y -= ny * overlap;
+                    nodePoint[v].z -= nz * overlap;
+                }
+            }
+        }
+
+        // B. spring attraction
+        edges.forEach((e) => {
+            const u = e.u;
+            const v = e.v;
+
+            if (!nodePoint[u] || !nodePoint[v]) return;
+
+            const dx = nodePoint[v].x - nodePoint[u].x;
+            const dy = nodePoint[v].y - nodePoint[u].y;
+            const dz = nodePoint[v].z - nodePoint[u].z;
+
+            const dist = Math.sqrt(dx * dx + dy * dy + dz * dz) || 0.01;
+
+            const target = 2;
+
+            const force = ATTRACTION_STRENGTH * (dist - target);
+
+            const fx = (dx / dist) * force;
+            const fy = (dy / dist) * force;
+            const fz = (dz / dist) * force;
+
+            forces[u].x += fx;
+            forces[u].y += fy;
+            forces[u].z += fz;
+
+            forces[v].x -= fx;
+            forces[v].y -= fy;
+            forces[v].z -= fz;
+        });
+
+        // C. center gravity + update
+        ALL_NODES.forEach((id) => {
+            const pos = nodePoint[id];
+            const center = nodeToCenter[id];
+            const cluster = nodeToClusterName[id];
+
+            const radius = clusterRadius[cluster];
+
+            const gdx = center.x - pos.x;
+            const gdy = center.y - pos.y;
+            const gdz = center.z - pos.z;
+
+            const gravity = BASE_CENTER_GRAVITY / (radius + 1);
+
+            forces[id].x += gdx * gravity;
+            forces[id].y += gdy * gravity;
+            forces[id].z += gdz * gravity;
+
+            velocities[id].x = (velocities[id].x + forces[id].x) * FRICTION;
+            velocities[id].y = (velocities[id].y + forces[id].y) * FRICTION;
+            velocities[id].z = (velocities[id].z + forces[id].z) * FRICTION;
+
+            pos.x += velocities[id].x;
+            pos.y += velocities[id].y;
+            pos.z += velocities[id].z;
+        });
+    }
+
+    return nodePoint;
 };
