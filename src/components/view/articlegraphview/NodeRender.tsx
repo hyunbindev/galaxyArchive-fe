@@ -33,7 +33,7 @@ export default function NodeRender({nodes, nodeColor}:NodeRenderProp){
 
             mesh.setMatrixAt(index, dummy.matrix);
         }
-        mesh.count = nodes.length-1;
+        mesh.count = nodes.length;
 
         mesh.instanceMatrix.needsUpdate = true;
         if(mesh.instanceColor) mesh.instanceColor.needsUpdate = true

@@ -15,8 +15,9 @@ export default function useGetArticleGraph() {
                 const res = await lightApi.get<Graph>('/api/v1/articles/graphs');
 
                 setData(res);
+                console.log(res);
             } catch (e) {
-                console.error("그래프 데이터 로딩 실패:", e);
+                console.error(e)
                 setError(e);
             } finally {
                 setLoading(false);
