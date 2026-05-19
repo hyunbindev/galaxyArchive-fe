@@ -1,19 +1,14 @@
 "use client"
-import GalaxyView from "@/components/view/@galaxyview";
-import {Graph} from "@/components/view/@galaxyview/types";
-import useArticleGraph from "@/app/(main)/useArticleGraph";
-import useArticleGraphApi from "@/app/(main)/test/useArticleGraphApi";
+
+import useGetArticleGraph from "@/app/(main)/test/useGetArticleGraph";
+import ArticleGraphView from "@/components/view/articlegraphview/ArticleGraphView";
 
 
 export default function test (){
-    const { graph } = useArticleGraphApi()
-
-
-    console.log(graph)
-
+    const { data, loading, error } = useGetArticleGraph();
     return(
-        <div>
-            <GalaxyView graph={graph}/>
+        <div className={"w-screen h-screen"}>
+            <ArticleGraphView graph={data}/>
         </div>
     )
 }
