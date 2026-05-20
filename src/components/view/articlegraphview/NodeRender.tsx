@@ -142,7 +142,6 @@ export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEv
 
                         if (clickNode && clickNode.id) {
                             onNodeClickEvent(clickNode.id);
-
                         }
                     }
                 }}
