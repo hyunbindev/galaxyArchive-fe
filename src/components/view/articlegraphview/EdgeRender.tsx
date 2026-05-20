@@ -5,7 +5,7 @@ import * as Three from "three";
 interface EdgeRenderProps{
     edges:Edge[];
     nodes:Node[];
-    edgeColor:Three.Color;
+    edgeColor:string;
 }
 
 export default function EdgeRender({ edges, nodes, edgeColor }:EdgeRenderProps){
@@ -50,11 +50,12 @@ export default function EdgeRender({ edges, nodes, edgeColor }:EdgeRenderProps){
             </bufferGeometry>
 
             <lineBasicMaterial
-                color={edgeColor}
+                color={new Three.Color(edgeColor)}
                 linewidth={1}
                 transparent
                 opacity={0.6}
             />
+
         </lineSegments>
     );
 
