@@ -58,7 +58,6 @@ export default function CameraController({ targetPosition }: CameraControllerPro
             }
         } else {
             // [인트로 종료 후: 일반 모드]
-            // 나중에 유저가 노드를 클릭했을 때 스무스하게 이동하는 lerp 로직이 여기 들어갈 자리야.
             if (targetPosition) {
                 const lerpSpeed = 0.08;
                 const targetVec = new Three.Color(targetPosition.x, targetPosition.y, targetPosition.z); // 벡터 대용 가상
@@ -72,10 +71,6 @@ export default function CameraController({ targetPosition }: CameraControllerPro
 
     return (
         <>
-            {/*
-               초기 position은 인트로 시작점인 우주 멀리[500, 300, 500]로 잡아둠
-               시작하자마자 useFrame이 이 위치를 낚아채서 나선형 무빙을 침
-            */}
             <PerspectiveCamera
                 ref={cameraRef}
                 makeDefault
