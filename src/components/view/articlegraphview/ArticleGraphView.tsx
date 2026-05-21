@@ -1,49 +1,48 @@
 "use client"
 
 import {Canvas} from "@react-three/fiber";
-import {OrbitControls, PerspectiveCamera} from "@react-three/drei";
+import {OrbitControls} from "@react-three/drei";
 import {Graph} from "@/components/view/articlegraphview/type";
 import NodeRender from "@/components/view/articlegraphview/NodeRender";
 import EdgeRender from "@/components/view/articlegraphview/EdgeRender";
 import { useTheme } from "next-themes";
-import {useEffect, useState} from "react";
+import { useState } from "react";
 import CameraController from "@/components/view/articlegraphview/CameraController";
+import { Node } from "@/components/view/articlegraphview/type";
+import {useRouter} from "next/navigation";
 
 interface ArticleGraphViewProps{
     graph:Graph|null
 }
 
-export default function ArticleGraphView({ graph }:ArticleGraphViewProps){
-    if(!graph) return;
+export default function ArticleGraphView({ graph }: ArticleGraphViewProps) {
     const { resolvedTheme } = useTheme();
-    const [mounted, setMounted] = useState(false);
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const [selectedNode, setSelectedNode] = useState<Node | null>(null);
 
-    const [selectedNode, setSelectedNode] =useState<number|null>(null);
+    const router = useRouter();
 
-    //로드중 스켈레톤등
-    if (!mounted) return null;
+    if(!graph) return;
 
-    const {clusters, nodes, edges} = graph
+    const { nodes, edges } = graph;
 
     const isDark = resolvedTheme === "dark";
+    const nodeColor = isDark ? "#c3c3c3" : "#404040";
+    const edgeColor = isDark ? "#4e4e4e" : "#919191";
+    const titleColor = isDark ? "white" : "black";
 
-    const nodeColor = isDark ?  "#c3c3c3" : "#404040";
-    const edgeColor = isDark? "#4e4e4e" : "#919191"
-    const titleColor = isDark? "white" : "black"
+    const onNodeClickEvent = (node: Node) => {
+        if(selectedNode == null || selectedNode.id != node.id){
+            setSelectedNode(node);
+            return;
+        }
+        if(selectedNode.id == node.id){
+            router.push(`/article/${node.id}`)
+        }
+    };
 
-    const onNodeClickEvent = (nodeId:number)=>{
-        setSelectedNode(nodeId);
-        console.log(selectedNode)
-    }
-
-
-    return(
+    return (
         <Canvas gl={{ antialias: true }} className="w-full h-full">
-
-            <CameraController/>
+            <CameraController targetPosition={selectedNode?.position} />]
 
             <OrbitControls />
 
@@ -52,6 +51,7 @@ export default function ArticleGraphView({ graph }:ArticleGraphViewProps){
                 nodeColor={nodeColor}
                 titleColor={titleColor}
                 onNodeClickEvent={onNodeClickEvent}
+                selectedNode={selectedNode}
             />
 
             <EdgeRender
@@ -60,6 +60,5 @@ export default function ArticleGraphView({ graph }:ArticleGraphViewProps){
                 edgeColor={edgeColor}
             />
         </Canvas>
-
-    )
+    );
 }

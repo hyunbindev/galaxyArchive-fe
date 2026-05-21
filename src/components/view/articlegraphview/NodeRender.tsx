@@ -8,7 +8,8 @@ interface NodeRenderProp {
     nodes: Node[];
     nodeColor: string;
     titleColor: string;
-    onNodeClickEvent: (nodeId: number) => void
+    onNodeClickEvent: (node: Node) => void;
+    selectedNode:Node|null;
 }
 
 // 텍스트 텍스처 생성 헬퍼 함수
@@ -17,24 +18,31 @@ function createTextTexture(text: string, titleColor: string): Three.CanvasTextur
     const ctx = canvas.getContext("2d");
     if (!ctx) return new Three.CanvasTexture(canvas);
 
+    //defaultFont Family
     const computedStyle = window.getComputedStyle(document.body);
     const defaultFontFamily = computedStyle.fontFamily;
 
+    //font size
     const fontSize = 50;
     ctx.font = `${fontSize}px ${defaultFontFamily}`;
 
+    //텍스트 실제 넓이
     const textMetrics = ctx.measureText(text);
     const textWidth = textMetrics.width;
 
+    //패딩
     const paddingX = 40;
     const paddingY = 20;
 
+    //실제 canvas 넓이 : 텍스트 넓이, 높이 + 패딩
     canvas.width = textWidth + paddingX;
     canvas.height = fontSize + paddingY;
 
     ctx.font = `${fontSize}px ${defaultFontFamily}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
+
+
 
     ctx.fillStyle = "rgba(0, 0, 0, 0)";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -52,33 +60,50 @@ function createTextTexture(text: string, titleColor: string): Three.CanvasTextur
     return texture;
 }
 
-export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEvent }: NodeRenderProp) {
+export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEvent , selectedNode }: NodeRenderProp) {
     const meshRef = useRef<Three.InstancedMesh>(null!);
     const textGroupRef = useRef<Three.Group>(null!);
 
-    // 1. 구체(Mesh) 위치 업데이트 로직
+    // 구체(Mesh) 위치 업데이트 로직
     useEffect(() => {
         const mesh = meshRef.current;
         if (!mesh || !nodes.length) return;
 
         const dummy = new Three.Object3D();
 
+        const colorDefault = new Three.Color(nodeColor);
+        //클릭시 변경될 노드 색
+        //const colorSelected = new Three.Color("#cccc");
+
         nodes.forEach((node, index) => {
             if (!node.position) return;
             dummy.position.set(node.position.x, node.position.y, node.position.z);
             dummy.updateMatrix();
             mesh.setMatrixAt(index, dummy.matrix);
+
+            mesh.setColorAt(index, colorDefault);
+
+            // 클릭시 노드색 변경 비활성화
+            // if (selectedNode !== null && node.id === selectedNode.id) {
+            //     mesh.setColorAt(index, colorSelected);
+            // } else {
+            //     mesh.setColorAt(index, colorDefault);
+            // }
         });
 
         mesh.count = nodes.length;
         mesh.instanceMatrix.needsUpdate = true;
 
-        // [수정 1] 핵심: 위치가 잡힌 인스턴스들의 충돌 감지 영역을 강제로 리컴퓨팅함
+        if (mesh.instanceColor) {
+            mesh.instanceColor.needsUpdate = true;
+        }
+
+        //인스턴스들의 충돌 감지 영역을 강제로 리컴퓨팅함
         mesh.computeBoundingBox();
         mesh.computeBoundingSphere();
-    }, [nodes]);
+    }, [nodeColor, nodes, selectedNode]);
 
-    // 2. 텍스트 스프라이트 생성 및 렌더링 로직
+    // 텍스트 스프라이트 생성 및 렌더링 로직
     useEffect(() => {
         const textGroup = textGroupRef.current;
         if (!textGroup) return;
@@ -133,22 +158,36 @@ export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEv
             <instancedMesh
                 ref={meshRef}
                 args={[undefined, undefined, nodes.length]}
-                // [수정 2] OrbitControls 씹힘 방지를 위해 onClick 대신 onPointerDown 사용
                 onPointerDown={(e) => {
                     e.stopPropagation();
 
                     if (e.instanceId !== undefined) {
                         const clickNode = nodes[e.instanceId];
 
-                        if (clickNode && clickNode.id) {
-                            onNodeClickEvent(clickNode.id);
+                        if (clickNode) {
+                            onNodeClickEvent(clickNode);
+                            console.log(clickNode)
                         }
                     }
                 }}
             >
                 <sphereGeometry args={[1.5, 32, 32]} />
-                <meshBasicMaterial color={nodeColor} />
+                <meshBasicMaterial />
             </instancedMesh>
+            {selectedNode && selectedNode.position && (
+                <mesh position={[selectedNode.position.x, selectedNode.position.y, selectedNode.position.z]}>
+                    <sphereGeometry args={[2.7, 32, 32]} />
+
+                    <meshBasicMaterial
+                        color="#A748FF"
+                        side={Three.BackSide}
+                        toneMapped={false}
+                        transparent={true}  // 1. 투명도 기능을 쓰겠다고 선언 (필수)
+                        opacity={0.6}       // 2. 알파값 지정 (0.0은 완전 투명, 1.0은 완전 불투명. 원하는 만큼 조절해)
+                    />
+
+                </mesh>
+            )}
             <group ref={textGroupRef} />
         </group>
     );
