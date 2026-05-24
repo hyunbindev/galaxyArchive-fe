@@ -1,32 +1,37 @@
-import {LightApiBuilder, LightApiConfig, Method, ResponseType} from './types'
-import {LightApiError} from "@/lib/ApiClient/LightApiError";
+import { LightApiBuilder, LightApiConfig, Method, ResponseType } from './types'
+import { LightApiError } from "@/lib/ApiClient/LightApiError";
 
-const defaultConfig:LightApiConfig = {
+// 구조 분해 할당을 위해 함수 내부나 매 요청마다 새로 생성되도록 처리하는 것이 안전함
+const createDefaultConfig = (): LightApiConfig => ({
     baseUrl: '',
     body: '',
-    headers: {'content-type':'application/json'},
+    headers: { 'content-type': 'application/json' },
     isCredentialWith: false,
     isDebugMode: false,
-    method:Method.GET ,
+    method: Method.GET,
     uri: '',
-    responseType:ResponseType.JSON
-}
+    responseType: ResponseType.JSON
+});
 
-export function lightApiBuilder<T>(customConfig?: Partial<LightApiConfig>):LightApiBuilder<T>{
-    const h = customConfig?.headers || {};
-    const config = {
-        ...defaultConfig,
+function lightApiBuilder<T>(customConfig?: Partial<LightApiConfig>): LightApiBuilder<T> {
+    const defaultCfg = createDefaultConfig();
+
+    const config: LightApiConfig = {
+        ...defaultCfg,
         ...customConfig,
-        headers: { ...defaultConfig.headers, ...(h || {}) }
-    }
+        headers: {
+            ...defaultCfg.headers,
+            ...(customConfig?.headers || {})
+        }
+    };
 
-    let promise:Promise<T> | null = null;
+    let promise: Promise<T> | null = null;
 
-    const execute = async():Promise<T>=>{
-        if(promise) return promise;
+    const execute = async (): Promise<T> => {
+        if (promise) return promise;
 
-        promise = (async ()=>{
-            const requestUrl = config.baseUrl? config.baseUrl + config.uri :config.uri;
+        promise = (async () => {
+            const requestUrl = config.baseUrl ? config.baseUrl + config.uri : config.uri;
 
             const fetchOptions: RequestInit = {
                 method: config.method,
@@ -35,127 +40,112 @@ export function lightApiBuilder<T>(customConfig?: Partial<LightApiConfig>):Light
                 credentials: config.isCredentialWith ? 'include' : 'same-origin'
             };
 
-            const response:Response = await fetch(requestUrl?requestUrl:'', fetchOptions);
+            const response = await fetch(requestUrl || '', fetchOptions);
 
-            if(!response.ok){
-                const statusMessage = response.statusText || 'Unknown Error';
+            if (!response.ok) {
+                const rawTextBody = await response.text().catch(() => {
+                    throw new LightApiError("Fail to Read Body", response.status, response, "");
+                });
 
                 let body;
-
-                const rawTextBody = await response.text().catch((e)=> {
-                    throw new LightApiError("Fail to Read Body", response.status, response,"")
-                })
-
-                try{
-                    body = JSON.parse(rawTextBody)
-                }catch (e){
-                    body = rawTextBody;
+                if (rawTextBody && rawTextBody.trim().length > 0) {
+                    try {
+                        body = JSON.parse(rawTextBody);
+                    } catch (e) {
+                        body = rawTextBody;
+                    }
+                } else {
+                    body = { message: response.statusText || "No response body" };
                 }
 
                 const finalMessage = (typeof body === 'object' && body !== null)
                     ? (body.message || body.error || JSON.stringify(body))
                     : (body || response.statusText || `HTTP Error ${response.status}`);
 
-                throw new LightApiError(finalMessage,response.status,response,body);
+                throw new LightApiError(finalMessage, response.status, response, body);
             }
-            let data: any;
 
-            try {
-                switch (config.responseType) {
-                    case ResponseType.JSON:
-                        data = await response.json();
-                        break;
-                    case ResponseType.TEXT:
-                        data = await response.text();
-                        break;
-                    case ResponseType.BLOB:
-                        data = await response.blob();
-                        break;
-                    default: {
-                        const rawText = await response.text().catch(() => "");
-                        try {
-                            data = JSON.parse(rawText);
-                        } catch {
-                            data = rawText;
-                        }
-                        break;
+            const rawText = await response.text().catch(() => "");
+
+            switch (config.responseType) {
+                case ResponseType.JSON: {
+                    if (!rawText || rawText.trim().length === 0) {
+                        return {} as T;
+                    }
+                    return JSON.parse(rawText) as T;
+                }
+                case ResponseType.TEXT:
+                    return rawText as any;
+
+                case ResponseType.BLOB: {
+
+                    return new Blob([rawText]) as any;
+                }
+
+                default: {
+                    if (rawText.length === 0) return undefined as any;
+                    try {
+                        return JSON.parse(rawText);
+                    } catch {
+                        return rawText as any;
                     }
                 }
-            } catch (e: any) {
-                throw new LightApiError(
-                    `Parsing Failed: ${JSON.parse(e.message) || response.statusText}`,
-                    response.status,
-                    response,
-                    "Check responseType or body format"
-                );
             }
-            return data as T;
         })();
-        return promise
-    }
+        return promise;
+    };
 
     const builder: LightApiBuilder<T> = {
         baseUrl(val) {
-            config.baseUrl = val ? val : "";
-            return proxy;
+            config.baseUrl = val || "";
+            return builder;
         },
-        header(key,value){
+        header(key, value) {
             config.headers[key] = value;
-            return proxy;
+            return builder;
         },
-
         contentType(type) {
+            delete config.headers['content-type'];
             config.headers['Content-Type'] = type;
-            return proxy;
+            return builder;
         },
-
         body(data) {
             config.body = JSON.stringify(data);
-            return proxy;
+            return builder;
         },
-
         params(p) {
             const sp = new URLSearchParams(p as any).toString();
-            if(config.uri){
+            if (config.uri) {
                 config.uri += (config.uri.includes('?') ? '&' : '?') + sp;
-            }else{
-                config.uri = sp
+            } else {
+                config.uri = sp;
             }
-            return proxy;
+            return builder;
         },
-
         cookies(c) {
             config.headers['Cookie'] = Object.entries(c).map(([k, v]) => `${k}=${v}`).join('; ');
-            return proxy;
+            return builder;
         },
-
         isCredentialRequest(withCredential) {
-            config.isCredentialWith = withCredential
-            return proxy;
+            config.isCredentialWith = withCredential;
+            return builder;
         },
-
         isDebugMode(isDebug) {
             config.isDebugMode = isDebug;
-            return proxy;
+            return builder;
+        },
+        responseType(type) {
+            config.responseType = type;
+            return builder;
         },
 
-        responseType(type){
-            config.responseType = type;
-            return proxy;
-        },
         then(onfulfilled, rejected) { return execute().then(onfulfilled, rejected); },
         catch(rejected) { return execute().catch(rejected); },
         finally(fin) { return execute().finally(fin); },
         [Symbol.toStringTag]: 'Promise'
-    }
+    };
 
-    const proxy = new Proxy(builder, {
-        get(target, prop, receiver) {
-            if (prop in target || prop === 'then') {
-                return Reflect.get(target, prop, receiver);
-            }
-        }
-    });
-
-    return proxy as unknown as LightApiBuilder<T>;
+    return builder;
 }
+
+export default lightApiBuilder;

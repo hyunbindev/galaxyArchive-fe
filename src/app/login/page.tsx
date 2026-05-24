@@ -14,9 +14,11 @@ export default function LoginPage(){
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
                     <a className="w-full" href='/oauth2/authorization/github'>
+
                     <Button className="w-full">
                         Get started with GitHub
                     </Button>
+
                     </a>
                     <a className="w-full" href='/oauth2/authorization/google'>
                     <Button className="w-full">

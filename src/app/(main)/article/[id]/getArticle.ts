@@ -13,6 +13,7 @@ export interface Article{
     text:string
     createdAt:string
 }
+
 export interface Author{
     id:string
     nickName:string

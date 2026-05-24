@@ -1,12 +1,13 @@
 import { ThemeModeToggle } from "@/components/theme/theme-selector";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button"
-import {getUser} from "@/components/header/getUser";
+
 import Link from "next/link";
 import UserDropDownMenu from "@/components/header/UserDropDownMenu";
+import { BlackButton } from "../ui/black-button";
+import getAuthenticatedUser from "@/lib/getAuthenticatedUser";
 
 export async function Header() {
-    const userInfo = await getUser();
+    const userInfo = await getAuthenticatedUser();
     return (
         <header className="fixed top-0 h-15 w-full flex justify-center items-center p-2 bg-white dark:bg-background backdrop-blur-md z-50 border-b border-border/50">
             <div className="w-full px-10 min-w-6xl mx-auto flex justify-between items-center">
@@ -34,7 +35,7 @@ export async function Header() {
                             </>
                         ):(
                         <a href="/login">
-                            <Button className="cursor-pointer">Sign In</Button>
+                            <BlackButton className="cursor-pointer">Sign In</BlackButton>
                         </a>
                         )}
                     </div>

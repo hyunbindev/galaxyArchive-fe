@@ -1,6 +1,5 @@
 "use client"
 
-import dynamic from "next/dynamic";
 import useGetArticleGraph from "@/app/(main)/useGetArticleGraph";
 import ArticleGraphView from "@/components/view/articlegraphview/ArticleGraphView";
 

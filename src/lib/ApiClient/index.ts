@@ -1,4 +1,4 @@
-import { lightApiBuilder } from './builder';
+import lightApiBuilder from './builder';
 import { Method ,LightApi } from './types';
 
 const createRequest = <T>(uri: string, method: typeof Method[keyof typeof Method]) => {
