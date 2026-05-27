@@ -42,7 +42,7 @@ export default function ArticleGraphView({ graph }: ArticleGraphViewProps) {
 
     return (
         <Canvas gl={{ antialias: true }} className="w-full h-full">
-            <CameraController targetPosition={selectedNode?.position} />]
+            <CameraController targetPosition={selectedNode?.position ?? { x: 0, y: 0, z: 0 }} />
 
             <OrbitControls />
 
