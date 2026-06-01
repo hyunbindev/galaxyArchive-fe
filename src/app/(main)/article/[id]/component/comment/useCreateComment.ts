@@ -12,17 +12,23 @@ export default function useCreateComment(articleId:number){
 
     const validationText=():boolean=>{
         if(text.trim().length == 0){
-            toast.warning("덧글을 입력해 주세요.", { position: "bottom-center" })
+            toast.warning("Please enter a comment.", { position: "bottom-center" })
             return false;
         }
         return true;
+    }
+
+    const afterCreateComment = ()=>{
+        setText('');
+        toast.info("Comment posted successfully.",{ position: "bottom-center" })
+        router.refresh()
     }
 
     const requestArticleComment = ()=>{
         if(!validationText()) return;
         const res = lightApi.post(`/api/v1/articles/${articleId}/comments`)
             .body({text : text})
-            .then((e)=>router.refresh())
+            .then((e)=>afterCreateComment())
             .catch((e)=>console.error(e))
     }
 
@@ -31,7 +37,7 @@ export default function useCreateComment(articleId:number){
         const res = lightApi.post(`/api/v1/articles/${articleId}/comments`)
             .body({text : text})
             .params({parentId : parentId})
-            .then((e)=>router.refresh())
+            .then((e)=>afterCreateComment())
             .catch((e)=>console.error(e))
     }
 
