@@ -23,6 +23,6 @@ export const getAuthenticatedUser = cache(async ():Promise<UserInfo | null> =>{
         .isCredentialRequest(true)
         .cookies({JSESSIONID: session})
         .catch((e)=>{ return null })
-})
+});
 
 export default getAuthenticatedUser

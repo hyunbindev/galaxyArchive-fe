@@ -9,17 +9,22 @@ import {Separator} from "@/components/ui/separator";
 import CommentField from "@/app/(main)/article/[id]/component/comment/CommentField";
 import AuthorInfo from "@/app/(main)/article/[id]/component/comment/AuthorInfo";
 import CommentElement from "@/app/(main)/article/[id]/component/comment/CommentElement";
+import getAuthenticatedUser from "@/lib/getAuthenticatedUser";
+import ArticleComment from "@/app/(main)/article/[id]/component/ArticleComment";
+import {getComments} from "@/app/(main)/article/[id]/component/comment/recomment/getComment";
 //TODO-2. remark-html로 sr-only 정적 HTML 매복,
 //TODO-3. dynamic loading에 스피너/스켈레톤 추가
 
 export default async function Page({params}: { params: { id: string } }) {
     const {id} = await params;
+    const userInfo = await getAuthenticatedUser();
 
     const numericId = parseInt(id, 10);
 
     if (isNaN(numericId)) {
         throw new Error("not valid article id");
     }
+    const comments = await getComments(numericId)
 
     const article: Article = await getArticle(numericId)
 
@@ -67,20 +72,7 @@ export default async function Page({params}: { params: { id: string } }) {
             </div>
 
             <Separator />
-            <div className="flex flex-col py-5">
-                <h3 className="py-1">Comments</h3>
-                <div className="relative before:absolute before:left-[19px] before:top-5 before:h-full before:w-[1px] before:bg-zinc-200 dark:before:bg-zinc-800">
-                    <AuthorInfo/>
-                    <CommentField/>
-                </div>
-                <div className="relative before:absolute before:left-[19px] before:top-5 before:h-full before:w-[1px] before:bg-zinc-200 dark:before:bg-zinc-800">
-                    <CommentElement/>
-                    <CommentElement/>
-                    <CommentElement/>
-                    <CommentElement/>
-                    <CommentElement/>
-                </div>
-            </div>
+            <ArticleComment userInfo={userInfo} articleId={numericId} comments={comments}/>
         </main>
     )
 }
