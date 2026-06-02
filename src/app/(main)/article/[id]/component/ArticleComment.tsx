@@ -17,7 +17,6 @@ export default function ArticleComment({userInfo, articleId, comments}:ArticleCo
 
     return(
         <div className="flex flex-col py-5">
-            <h3 className="py-1">Comments</h3>
             <div className={cn(comments.length > 0 && "relative before:absolute before:left-4.75 before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800")}>
                 <AuthorInfo userInfo={userInfo}/>
                 <CommentField articleId={articleId}/>

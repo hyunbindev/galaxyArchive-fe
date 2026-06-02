@@ -11,7 +11,7 @@ interface AuthorInfoProps{
 export default function AuthorInfo({userInfo}:AuthorInfoProps){
     return(
         <div className="flex items-center gap-3 pb-3">
-            <Avatar className="h-10 w-10 border border-border/40">
+            <Avatar className="h-9 w-9 border border-border/40">
 
                 <AvatarImage
                     src={userInfo?.profileImageUrl}
@@ -21,7 +21,7 @@ export default function AuthorInfo({userInfo}:AuthorInfoProps){
                 <AvatarFallback>CN</AvatarFallback>
 
             </Avatar>
-            <span className="text-lg">{userInfo?.nickName}</span>
+            <span className="">{userInfo?.nickName}</span>
         </div>
     )
 }

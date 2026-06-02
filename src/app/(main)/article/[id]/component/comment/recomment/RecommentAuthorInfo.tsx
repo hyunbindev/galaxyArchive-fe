@@ -8,14 +8,14 @@ interface RecommentAuthorInfo{
 export default function RecommentAuthorInfo({authorInfo}:RecommentAuthorInfo){
     return(
         <div className="flex items-center gap-3 pb-3">
-            <Avatar className="h-10 w-10 border border-border/40">
+            <Avatar className="h-9 w-9 border border-border/40">
                 <AvatarImage
                     src={authorInfo?.profileImageUrl}
                     alt={`${authorInfo?.nickName}'s profile image`}
                 />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <span className="text-lg">{authorInfo?.nickName}</span>
+            <span className="">{authorInfo?.nickName}</span>
         </div>
     )
 }
