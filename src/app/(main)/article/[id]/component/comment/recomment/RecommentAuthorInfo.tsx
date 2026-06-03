@@ -7,7 +7,7 @@ interface RecommentAuthorInfo{
 
 export default function RecommentAuthorInfo({authorInfo}:RecommentAuthorInfo){
     return(
-        <div className="flex items-center gap-3 pb-3">
+        <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9 border border-border/40">
                 <AvatarImage
                     src={authorInfo?.profileImageUrl}
@@ -15,7 +15,7 @@ export default function RecommentAuthorInfo({authorInfo}:RecommentAuthorInfo){
                 />
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <span className="">{authorInfo?.nickName}</span>
+            <span className="text-sm">{authorInfo?.nickName}</span>
         </div>
     )
 }

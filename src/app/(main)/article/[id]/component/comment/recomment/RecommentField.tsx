@@ -12,6 +12,8 @@ import { SendHorizontal } from "lucide-react"
 import RecommentAuthorInfo from "@/app/(main)/article/[id]/component/comment/recomment/RecommentAuthorInfo";
 import useCreateComment from "@/app/(main)/article/[id]/component/comment/useCreateComment";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import {cn} from "@/lib/utils";
+import {Button} from "@/components/ui/button";
 
 interface RecommentFieldProps {
     articleId:number;
@@ -24,21 +26,21 @@ export default function RecommentField({ articleId ,commentId ,authorInfo }:Reco
     return(
         <>
         <RecommentAuthorInfo authorInfo={authorInfo}/>
-        <div className="ml-10 pb-10">
+        <div className="ml-10 pb-7">
 
             <FieldGroup className="max-w-full">
                 <Field>
                     <InputGroup>
                         <InputGroupTextarea
                             value={text}
-                            onChange={(e)=>setText(e.target.value)}
+                            rows={1}
+                            className={cn("text-sm py-2")}
+                            onChange={e=>{ setText(e.target.value)} }
                             placeholder="Write a comment..."
                         />
-                        <InputGroupAddon align="block-end">
-                            <InputGroupButton variant="default" size="sm" className="ml-auto" onClick={()=>requestArticleRecomment(commentId)}>
-                                <SendHorizontal size={16} />
-                            </InputGroupButton>
-                        </InputGroupAddon>
+                        <Button variant="default" size="xs" className={cn("absolute right-2 bottom-1.5 cursor-pointer")} onClick={()=>requestArticleRecomment(commentId)}>
+                            <SendHorizontal/>
+                        </Button>
                     </InputGroup>
                 </Field>
             </FieldGroup>

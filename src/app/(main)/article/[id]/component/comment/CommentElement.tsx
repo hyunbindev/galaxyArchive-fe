@@ -20,7 +20,7 @@ interface CommentElementProps{
 export default function CommentElement({ comment , index , totalSize , articleId, authorInfo }:CommentElementProps){
     const [viewReply , setViewReply] = useState<boolean>(false);
     return(
-        <div className={`relative flex flex-col pb-10 ${(index < totalSize-1)||viewReply ? 'not-last:before:absolute before:left-4.75 not-last:before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800':''}`}>
+        <div className={`relative flex flex-col pb-7 ${(index < totalSize-1)||viewReply ? 'not-last:before:absolute before:left-4.75 not-last:before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800':''}`}>
             <span className="absolute -top-2 ml-12 text-xs text-gray-500">{timeConvert(comment.createdAt)}</span>
 
             <div className="flex items-center gap-3">
