@@ -7,12 +7,12 @@ interface RecommentProps{
     articleId:number;
     commentId:number;
     recomments:ArticleCommentResponse[];
-    authorInfo:UserInfo|null;
+    userInfo:UserInfo|null;
     isParentDeleted:boolean;
 }
 
 
-export function Recomment({ recomments, commentId, articleId, authorInfo, isParentDeleted }:RecommentProps) {
+export function Recomment({ recomments, commentId, articleId, userInfo, isParentDeleted }:RecommentProps) {
     return (
         <div className="relative ml-10 py-7 pl-5
             before:absolute before:-left-5.25 before:-top-3.25 before:h-15 before:w-10
@@ -20,11 +20,11 @@ export function Recomment({ recomments, commentId, articleId, authorInfo, isPare
             before:rounded-bl-4xl"
         >
             <div className={recomments.length >0 ?`relative before:absolute before:left-4.75 before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800` : ``}>
-                {!isParentDeleted && <RecommentField articleId={articleId} commentId={commentId} authorInfo={authorInfo}/>}
+                {!isParentDeleted && <RecommentField articleId={articleId} commentId={commentId} authorInfo={userInfo}/>}
             </div>
 
             <div className="flex flex-col [&>div:not(:last-child)]:pb-10">
-                {recomments.map((recomment,_)=>(<RecommentElement key={recomment.id} articleId={articleId} recomment={recomment}/>))}
+                {recomments.map((recomment,_)=>(<RecommentElement key={recomment.id} articleId={articleId} userInfo={userInfo} recomment={recomment}/>))}
             </div>
 
         </div>

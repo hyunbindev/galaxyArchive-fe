@@ -1,5 +1,7 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import {cn} from "@/lib/utils";
+import Link from "next/link";
 
 interface RecommentAuthorInfo{
     authorInfo:UserInfo|null;
@@ -15,7 +17,10 @@ export default function RecommentAuthorInfo({authorInfo}:RecommentAuthorInfo){
                 />
                 <AvatarFallback>?</AvatarFallback>
             </Avatar>
-            <span className="text-sm">{authorInfo?.nickName}</span>
+            {authorInfo?
+                <span className={cn("text-sm")}>{authorInfo.nickName}</span>
+                : <Link className="text-sm text-muted-foreground hover:underline" href="/login">답글을 작성하려면 로그인이 필요합니다.</Link>
+            }
         </div>
     )
 }

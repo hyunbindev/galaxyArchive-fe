@@ -7,13 +7,15 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {MoreVertical, TrashIcon} from "lucide-react";
-import { cn } from "@/lib/utils";
+import {UserInfo} from "@/lib/getAuthenticatedUser";
 
 interface CommentOptionProps{
+    userInfo:UserInfo|null;
+    authorInfo:UserInfo;
     onDelete:()=>void;
 }
 
-export default function CommentOption({onDelete}:CommentOptionProps){
+export default function CommentOption({ onDelete,userInfo,authorInfo }:CommentOptionProps){
     return(
         <div className="absolute right-0">
             <DropdownMenu>
@@ -24,10 +26,11 @@ export default function CommentOption({onDelete}:CommentOptionProps){
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
-                        <DropdownMenuItem onClick={onDelete} variant="destructive" className="cursor-pointer text-xs">
+
+                        {authorInfo.id == userInfo?.id && <DropdownMenuItem onClick={onDelete} variant="destructive" className="cursor-pointer text-xs">
                             <TrashIcon />
                             Delete
-                        </DropdownMenuItem>
+                        </DropdownMenuItem>}
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>

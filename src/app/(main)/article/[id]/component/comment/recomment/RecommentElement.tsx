@@ -6,14 +6,16 @@ import {timeConvert} from "@/lib/utils";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
 import useArticleDelete from "@/app/(main)/article/[id]/useDeleteArticle";
 import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
+import {UserInfo} from "@/lib/getAuthenticatedUser";
 
 interface RecommentElementProps{
     recomment:ArticleCommentResponse;
+    userInfo:UserInfo|null;
     articleId:number;
 }
 
 
-export default function RecommentElement({recomment,articleId}:RecommentElementProps){
+export default function RecommentElement({recomment,articleId,userInfo}:RecommentElementProps){
     const {requestDelete} = useDeleteComment(articleId, recomment.id)
     return(
     <>
@@ -28,7 +30,8 @@ export default function RecommentElement({recomment,articleId}:RecommentElementP
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
 
-                <CommentOption onDelete={requestDelete}/>
+                {userInfo &&
+                    <CommentOption onDelete={requestDelete} authorInfo={recomment.author} userInfo={userInfo}/>}
 
                 <span className="text-sm">{recomment.author.nickName}</span>
             </div>

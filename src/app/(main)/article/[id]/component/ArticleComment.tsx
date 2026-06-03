@@ -19,12 +19,12 @@ export default function ArticleComment({userInfo, articleId, comments}:ArticleCo
         <div className="flex flex-col py-5">
             <div className={cn(comments.length > 0 && "relative before:absolute before:left-4.75 before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800")}>
                 <AuthorInfo userInfo={userInfo}/>
-                <CommentField articleId={articleId}/>
+                <CommentField articleId={articleId} userInfo={userInfo}/>
             </div>
 
             <div>
                 {comments.map((comment, index)=>(
-                    <CommentElement key={comment.id} comment={comment} articleId={articleId} index={index} totalSize={comments.length} authorInfo={userInfo}/>
+                    <CommentElement key={comment.id} comment={comment} articleId={articleId} index={index} totalSize={comments.length} authorInfo={comment.author} userInfo={userInfo}/>
                 ))}
             </div>
         </div>

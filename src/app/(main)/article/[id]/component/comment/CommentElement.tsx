@@ -12,16 +12,18 @@ import {MessageSquare} from "lucide-react";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
 import useArticleDelete from "@/app/(main)/article/[id]/useDeleteArticle";
 import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
+import {userInfo} from "os";
 
 interface CommentElementProps{
     articleId:number;
     comment:ArticleCommentResponse;
     index:number;
     totalSize:number;
-    authorInfo:UserInfo|null;
+    authorInfo:UserInfo;
+    userInfo:UserInfo|null;
 }
 
-export default function CommentElement({ comment , index , totalSize , articleId, authorInfo }:CommentElementProps){
+export default function CommentElement({ comment , index , totalSize , articleId, authorInfo , userInfo }:CommentElementProps){
     const [viewReply , setViewReply] = useState<boolean>(false);
 
     useEffect(()=>{
@@ -42,7 +44,7 @@ export default function CommentElement({ comment , index , totalSize , articleId
                     <AvatarFallback>?</AvatarFallback>
                 </Avatar>
 
-                {!comment.isDeleted && <CommentOption onDelete={requestDelete}/>}
+                {!comment.isDeleted && userInfo && <CommentOption onDelete={requestDelete} authorInfo={authorInfo} userInfo={userInfo}/>}
 
                 <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>
             </div>
@@ -56,7 +58,7 @@ export default function CommentElement({ comment , index , totalSize , articleId
                     </Toggle>
                 }
             </div>
-            {viewReply && <Recomment recomments={comment.children} commentId={comment.id} articleId={articleId} authorInfo={authorInfo} isParentDeleted={comment.isDeleted}/>}
+            {viewReply && <Recomment recomments={comment.children} commentId={comment.id} articleId={articleId} userInfo={userInfo} isParentDeleted={comment.isDeleted}/>}
         </div>
     )
 }

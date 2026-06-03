@@ -23,6 +23,9 @@ interface RecommentFieldProps {
 
 export default function RecommentField({ articleId ,commentId ,authorInfo }:RecommentFieldProps){
     const { text, setText, requestArticleRecomment } = useCreateComment(articleId);
+
+    const placeHolder:string = authorInfo? "write a recomment..." : "Log in to leave a recomment"
+
     return(
         <>
         <RecommentAuthorInfo authorInfo={authorInfo}/>
@@ -34,11 +37,12 @@ export default function RecommentField({ articleId ,commentId ,authorInfo }:Reco
                         <InputGroupTextarea
                             value={text}
                             rows={1}
+                            disabled={!authorInfo}
                             className={cn("text-sm py-2")}
                             onChange={e=>{ setText(e.target.value)} }
-                            placeholder="Write a comment..."
+                            placeholder={placeHolder}
                         />
-                        <Button variant="default" size="xs" className={cn("absolute right-2 bottom-1.5 cursor-pointer")} onClick={()=>requestArticleRecomment(commentId)}>
+                        <Button disabled={!authorInfo} variant="default" size="xs" className={cn("absolute right-2 bottom-1.5 cursor-pointer")} onClick={()=>requestArticleRecomment(commentId)}>
                             <SendHorizontal/>
                         </Button>
                     </InputGroup>

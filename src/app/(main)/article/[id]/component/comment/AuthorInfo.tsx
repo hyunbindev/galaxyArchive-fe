@@ -2,7 +2,9 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import { cn } from "@/lib/utils";
 import {User, User2} from "lucide-react";
+import Link from "next/link";
 
 
 interface AuthorInfoProps{
@@ -24,7 +26,10 @@ export default function AuthorInfo({userInfo}:AuthorInfoProps){
                 </AvatarFallback>
 
             </Avatar>
-            <span className="">{userInfo?.nickName}</span>
+            {userInfo?
+                <span className={cn("text-sm")}>{userInfo.nickName}</span>
+                : <Link className="text-sm text-muted-foreground hover:underline" href="/login">덧글을 작성하려면 로그인이 필요합니다.</Link>
+            }
         </div>
     )
 }
