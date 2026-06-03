@@ -18,14 +18,16 @@ import {useRouter} from "next/navigation";
 
 interface CommentFieldProps {
     articleId:number;
-    userInfo:UserInfo|null;
+    userInfo:UserInfo;
 }
 
 export default function CommentField({articleId, userInfo}:CommentFieldProps){
+    const router = useRouter();
 
     const { text , setText , requestArticleComment } = useCreateComment(articleId);
 
     const placeHolder:string = userInfo? "write a comment..." : "Log in to leave a comment"
+
 
     return(
         <div className="relative ml-10 pb-10">
@@ -40,7 +42,7 @@ export default function CommentField({articleId, userInfo}:CommentFieldProps){
                             onChange={e=>{ setText(e.target.value)} }
                             placeholder={placeHolder}
                         />
-                        <Button disabled={!userInfo} variant="default" size="xs" className={cn("absolute right-2 bottom-1.5 cursor-pointer")} onClick={requestArticleComment}>
+                        <Button variant="default" size="xs" className={cn("absolute right-2 bottom-1.5 cursor-pointer")} onClick={requestArticleComment}>
                             <SendHorizontal/>
                         </Button>
                     </InputGroup>

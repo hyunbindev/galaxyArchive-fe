@@ -10,9 +10,8 @@ import {cn, timeConvert} from "@/lib/utils";
 import {Toggle} from "@/components/ui/toggle";
 import {MessageSquare} from "lucide-react";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
-import useArticleDelete from "@/app/(main)/article/[id]/useDeleteArticle";
 import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
-import {userInfo} from "os";
+
 
 interface CommentElementProps{
     articleId:number;
@@ -36,6 +35,7 @@ export default function CommentElement({ comment , index , totalSize , articleId
             <span className="absolute -top-2 ml-12 text-xs text-gray-500">{timeConvert(comment.createdAt)}</span>
 
             <div className="flex items-center gap-3">
+
                 <Avatar className="h-9 w-9 border border-border/40 z-1">
                     <AvatarImage
                         src={comment.author.profileImageUrl}

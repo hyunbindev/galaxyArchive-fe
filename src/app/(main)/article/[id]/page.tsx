@@ -3,15 +3,12 @@ import MilkdownViewer from "@/components/view/MilkdownViewer";
 import getArticle, {Article} from "@/app/(main)/article/[id]/getArticle";
 
 
-import Controller from "@/app/(main)/article/[id]/component/Controller";
 import Profile from "@/app/(main)/article/[id]/component/Profile";
 import {Separator} from "@/components/ui/separator";
-import CommentField from "@/app/(main)/article/[id]/component/comment/CommentField";
-import AuthorInfo from "@/app/(main)/article/[id]/component/comment/AuthorInfo";
-import CommentElement from "@/app/(main)/article/[id]/component/comment/CommentElement";
 import getAuthenticatedUser from "@/lib/getAuthenticatedUser";
 import ArticleComment from "@/app/(main)/article/[id]/component/ArticleComment";
 import {getComments} from "@/app/(main)/article/[id]/component/comment/recomment/getComment";
+import ArticleOption from "@/app/(main)/article/[id]/component/ArticleOption";
 //TODO-2. remark-html로 sr-only 정적 HTML 매복,
 //TODO-3. dynamic loading에 스피너/스켈레톤 추가
 
@@ -59,7 +56,7 @@ export default async function Page({params}: { params: { id: string } }) {
 
                     <div className="flex justify-between items-center py-4 mt-4">
                         <Profile profileImageUrl={article.author.profileImageUrl} nickName={article.author.nickName}/>
-                        <Controller article={article}/>
+                        <ArticleOption article={article}/>
                     </div>
                 </div>
                 <Separator />

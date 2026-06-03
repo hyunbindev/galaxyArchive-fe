@@ -10,7 +10,7 @@ interface ControllerProps{
     article:Article;
 }
 
-export default async function Controller({article}:ControllerProps){
+export default async function ArticleOption({article}:ControllerProps){
     const userInfo:UserInfo|null = await getAuthenticatedUser();
 
     if(!userInfo) return;
@@ -18,9 +18,11 @@ export default async function Controller({article}:ControllerProps){
     if(userInfo.id === article.author.id){
         return(
             <ButtonGroup>
-                <WhiteButton variant="outline" className="cursor-pointer">
-                    <SquarePen className="h-4 w-4" />Update
-                </WhiteButton>
+                {
+                    // <WhiteButton variant="outline" className="cursor-pointer">
+                    //     <SquarePen className="h-4 w-4" />Update
+                    // </WhiteButton>
+                }
                 <DeleteModal article={article}/>
             </ButtonGroup>
         )
