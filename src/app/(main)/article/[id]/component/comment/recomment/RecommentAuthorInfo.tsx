@@ -13,7 +13,7 @@ export default function RecommentAuthorInfo({authorInfo}:RecommentAuthorInfo){
                     src={authorInfo?.profileImageUrl}
                     alt={`${authorInfo?.nickName}'s profile image`}
                 />
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>?</AvatarFallback>
             </Avatar>
             <span className="text-sm">{authorInfo?.nickName}</span>
         </div>

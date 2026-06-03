@@ -5,5 +5,6 @@ export interface ArticleCommentResponse{
     author: UserInfo;
     createdAt:string;
     text:string;
-    children:ArticleCommentResponse[]
+    children:ArticleCommentResponse[];
+    isDeleted:boolean;
 }

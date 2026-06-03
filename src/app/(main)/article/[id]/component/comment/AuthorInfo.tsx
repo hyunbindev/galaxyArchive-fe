@@ -2,6 +2,7 @@
 
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import {User, User2} from "lucide-react";
 
 
 interface AuthorInfoProps{
@@ -18,7 +19,9 @@ export default function AuthorInfo({userInfo}:AuthorInfoProps){
                     alt={`${userInfo?.nickName}'s profile image`}
                 />
 
-                <AvatarFallback>CN</AvatarFallback>
+                <AvatarFallback>
+                    ?
+                </AvatarFallback>
 
             </Avatar>
             <span className="">{userInfo?.nickName}</span>

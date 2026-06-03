@@ -3,14 +3,18 @@ import RecommentField from "@/app/(main)/article/[id]/component/comment/CommentF
 import RecommentAuthorInfo from "@/app/(main)/article/[id]/component/comment/recomment/RecommentAuthorInfo";
 import {ArticleCommentResponse} from "@/app/(main)/article/[id]/component/type";
 import {timeConvert} from "@/lib/utils";
+import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
+import useArticleDelete from "@/app/(main)/article/[id]/useDeleteArticle";
+import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
 
 interface RecommentElementProps{
     recomment:ArticleCommentResponse;
-
+    articleId:number;
 }
 
 
-export default function RecommentElement({recomment}:RecommentElementProps){
+export default function RecommentElement({recomment,articleId}:RecommentElementProps){
+    const {requestDelete} = useDeleteComment(articleId, recomment.id)
     return(
     <>
         <div className="relative not-last:before:absolute not-last:before:left-4.75 not-last:before:top-5 not-last:before:h-full not-last:before:w-px not-last:before:bg-zinc-200 dark:not-last:before:bg-zinc-800">
@@ -23,6 +27,9 @@ export default function RecommentElement({recomment}:RecommentElementProps){
                     />
                     <AvatarFallback>CN</AvatarFallback>
                 </Avatar>
+
+                <CommentOption onDelete={requestDelete}/>
+
                 <span className="text-sm">{recomment.author.nickName}</span>
             </div>
             <div className="ml-12 text-sm text-gray-700 dark:text-gray-400">

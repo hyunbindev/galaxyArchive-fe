@@ -4,10 +4,14 @@ import {Recomment} from "@/app/(main)/article/[id]/component/comment/recomment/R
 
 import {ArticleCommentResponse} from "@/app/(main)/article/[id]/component/type";
 
-import {ArrowDown, ArrowUp, CornerDownRight} from "lucide-react";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
 import {cn, timeConvert} from "@/lib/utils";
+import {Toggle} from "@/components/ui/toggle";
+import {MessageSquare} from "lucide-react";
+import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
+import useArticleDelete from "@/app/(main)/article/[id]/useDeleteArticle";
+import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
 
 interface CommentElementProps{
     articleId:number;
@@ -19,6 +23,12 @@ interface CommentElementProps{
 
 export default function CommentElement({ comment , index , totalSize , articleId, authorInfo }:CommentElementProps){
     const [viewReply , setViewReply] = useState<boolean>(false);
+
+    useEffect(()=>{
+        if(comment.isDeleted && comment.children.length == 0) setViewReply(false);
+    },[comment.children , comment.isDeleted])
+
+    const { requestDelete } = useDeleteComment(articleId, comment.id)
     return(
         <div className={`relative flex flex-col pb-7 ${(index < totalSize-1)||viewReply ? 'not-last:before:absolute before:left-4.75 not-last:before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800':''}`}>
             <span className="absolute -top-2 ml-12 text-xs text-gray-500">{timeConvert(comment.createdAt)}</span>
@@ -29,20 +39,24 @@ export default function CommentElement({ comment , index , totalSize , articleId
                         src={comment.author.profileImageUrl}
                         alt={`${comment.author.nickName}'s profile image`}
                     />
-                    <AvatarFallback>CN</AvatarFallback>
+                    <AvatarFallback>?</AvatarFallback>
                 </Avatar>
 
-                <span className="text-sm">{comment.author.nickName}</span>
+                {!comment.isDeleted && <CommentOption onDelete={requestDelete}/>}
+
+                <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>
             </div>
 
             <div className={cn("relative ml-12 text-gray-700 dark:text-gray-400", viewReply && "before:absolute before:content-[''] before:-left-7.25 before:top-0 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800")}>
-                <div className="pb-2 whitespace-pre-wrap text-sm">{comment.text}</div>
-                <div onClick={()=>setViewReply(!viewReply)} className="flex gap-2 items-center cursor-pointer hover:underline text-gray-600">
-                    <span className="text-xs">{comment.children.length} recomments</span>
-                    {viewReply ? <ArrowUp className="h-3 w-3"/> : <ArrowDown className="h-3 w-3"/>}
-                </div>
+                <div className="pb-3 whitespace-pre-wrap text-sm">{comment.isDeleted? "사용자가 삭제한 덧글 입니다.":comment.text}</div>
+                {!(comment.children.length <1 && comment.isDeleted) &&
+                    <Toggle pressed={viewReply} onClick={()=>setViewReply(!viewReply)} className="cursor-pointer">
+                        <MessageSquare />
+                        <span className="text-xs">{comment.children.length.toLocaleString()}</span>
+                    </Toggle>
+                }
             </div>
-            {viewReply && <Recomment recomments={comment.children} commentId={comment.id} articleId={articleId} authorInfo={authorInfo}/>}
+            {viewReply && <Recomment recomments={comment.children} commentId={comment.id} articleId={articleId} authorInfo={authorInfo} isParentDeleted={comment.isDeleted}/>}
         </div>
     )
 }
