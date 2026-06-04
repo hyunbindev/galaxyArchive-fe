@@ -9,3 +9,4 @@ export function timeConvert(localDateTime:string){
   const date = new Date(localDateTime);
   return `${date.getFullYear()}.${date.getMonth()+1}.${date.getDate()}`
 }
+

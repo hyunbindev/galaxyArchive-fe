@@ -5,6 +5,7 @@ import Link from "next/link";
 import UserDropDownMenu from "@/components/header/UserDropDownMenu";
 import { BlackButton } from "../ui/black-button";
 import getAuthenticatedUser from "@/lib/getAuthenticatedUser";
+import LoginLink from "../LoginLink";
 
 export async function Header() {
     const userInfo = await getAuthenticatedUser();
@@ -34,9 +35,9 @@ export async function Header() {
                             <div className="text-md font-medium text-foreground">{userInfo.nickName}</div>
                             </>
                         ):(
-                        <a href="/login">
-                            <BlackButton className="cursor-pointer">Sign In</BlackButton>
-                        </a>
+                            <LoginLink>
+                                <BlackButton className="cursor-pointer">Sign In</BlackButton>
+                            </LoginLink>
                         )}
                     </div>
             </div>

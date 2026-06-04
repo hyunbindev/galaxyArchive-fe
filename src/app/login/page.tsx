@@ -1,8 +1,17 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
 
+interface PageProps {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
+}
 
-export default function LoginPage(){
+export default async function LoginPage({ searchParams }: PageProps){
+
+    const resolvedParams = await searchParams;
+    const redirectUrl = (resolvedParams.redirect as string) || '';
+
+    const queryString = redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : '';
+
     return(
         <div className="flex flex-col items-center justify-center h-screen">
             <Card className="w-full max-w-md bg-background z-99">
@@ -13,14 +22,14 @@ export default function LoginPage(){
                 <CardContent>
                 </CardContent>
                 <CardFooter className="flex-col gap-2">
-                    <a className="w-full" href='/oauth2/authorization/github'>
+                    <a className="w-full" href={`/oauth2/authorization/github${queryString}`}>
 
                     <Button className="w-full">
                         Get started with GitHub
                     </Button>
 
                     </a>
-                    <a className="w-full" href='/oauth2/authorization/google'>
+                    <a className="w-full" href={`/oauth2/authorization/google${queryString}`}>
                     <Button className="w-full">
                         Get started with Google
                     </Button>
