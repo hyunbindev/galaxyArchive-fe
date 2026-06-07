@@ -6,6 +6,10 @@ export default function Home() {
           <main>
               <MainArticleGraphView/>
           </main>
+
+      <div>
+      asdl;jkflasdjkfljadklsjf
+      </div>
       </>
     );
 }
