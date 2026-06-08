@@ -42,24 +42,23 @@ export default async function Page({params}: { params: { id: string } }) {
     };
 
     return (
-        <main className=" max-w-4xl mx-auto bg-background pb-20 mt-15">
+        <main className="max-w-4xl mx-auto bg-background pb-20 mt-15">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{__html: JSON.stringify(jsonLd)}}
             />
             <div className="flex-col pt-10 ">
                 <div className="w-full flex flex-col">
-                    <span
-                        className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth() + 1}.${createAtDate.getDate()}`}</span>
+                    <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth() + 1}.${createAtDate.getDate()}`}</span>
 
-                    <h1 className="text-4xl bg-transparent">{article.title}</h1>
+                    <h1 className="text-4xl bg-transparent">{ article.title }</h1>
 
                     <div className="flex justify-between items-center py-4 mt-4">
-                        <Profile profileImageUrl={article.author.profileImageUrl} nickName={article.author.nickName}/>
+                        <Profile profileImageUrl={article.author.profileImageUrl} nickName={ article.author.nickName }/>
                         <ArticleOption article={article}/>
                     </div>
                 </div>
-                <Separator />
+                <Separator/>
             </div>
 
 
@@ -69,7 +68,7 @@ export default async function Page({params}: { params: { id: string } }) {
                 </div>
             </div>
 
-            <Separator />
+            <Separator/>
             <ArticleComment userInfo={userInfo} articleId={numericId} comments={comments}/>
         </main>
     )

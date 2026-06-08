@@ -6,7 +6,7 @@ import {ArticleCommentResponse} from "@/app/(main)/article/[id]/component/type";
 
 import {useEffect, useState} from "react";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
-import {cn, timeConvert} from "@/lib/utils";
+import {cn, dateConvert} from "@/lib/utils";
 import {Toggle} from "@/components/ui/toggle";
 import {MessageSquare} from "lucide-react";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
@@ -32,7 +32,7 @@ export default function CommentElement({ comment , index , totalSize , articleId
     const { requestDelete } = useDeleteComment(articleId, comment.id)
     return(
         <div className={`relative flex flex-col pb-7 ${(index < totalSize-1)||viewReply ? 'not-last:before:absolute before:left-4.75 not-last:before:top-5 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800':''}`}>
-            <span className="absolute -top-2 ml-12 text-xs text-gray-500">{timeConvert(comment.createdAt)}</span>
+            <span className="absolute -top-2 ml-12 text-xs text-gray-500">{dateConvert(comment.createdAt)}</span>
 
             <div className="flex items-center gap-3">
 
