@@ -38,7 +38,7 @@ export default function useArticleDelete(article:Article){
         toast.info("게시글이 삭제 되었습니다.",{position : "top-center"})
 
 
-        router.replace('/')
+        router.back()
     }
 
     return { requestDeleteArticle, titleInput, setTitleInput, status, message }
