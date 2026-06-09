@@ -22,10 +22,6 @@ export default function useGetNewArticleList(authorId:string, size:number){
     const lastArticleId = useRef<number | null>(null);
     const isLoading = useRef<boolean>(false);
 
-    useEffect(() => {
-        console.log(articleSummeryPage)
-    }, [articleSummeryPage]);
-
     useEffect(()=>{
         const requestNewArticleFirstPage = async() =>{
             const queryParams:Record<string,any> = { size : size }
@@ -43,7 +39,6 @@ export default function useGetNewArticleList(authorId:string, size:number){
             setArticleSummeryPage(prev=>[...prev, res.articles]);
             if(res.hasNextPage){
                 requestNextPage()
-            }else{
                 lastArticleId.current = res.cursorArticleId;
             }
         }
