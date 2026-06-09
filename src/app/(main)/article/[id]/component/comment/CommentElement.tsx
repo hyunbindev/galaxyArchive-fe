@@ -11,6 +11,7 @@ import {Toggle} from "@/components/ui/toggle";
 import {MessageSquare} from "lucide-react";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
 import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
+import Link from "next/link";
 
 
 interface CommentElementProps{
@@ -46,7 +47,12 @@ export default function CommentElement({ comment , index , totalSize , articleId
 
                 {!comment.isDeleted && userInfo && <CommentOption onDelete={requestDelete} authorInfo={authorInfo} userInfo={userInfo}/>}
 
-                <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>
+                {comment.isDeleted?
+                    <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>:
+                    <Link href={`/user/${comment.author.id}`}>
+                        <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>
+                    </Link>
+                }
             </div>
 
             <div className={cn("relative ml-12 text-gray-700 dark:text-gray-400", viewReply && "before:absolute before:content-[''] before:-left-7.25 before:top-0 before:h-full before:w-px before:bg-zinc-200 dark:before:bg-zinc-800")}>

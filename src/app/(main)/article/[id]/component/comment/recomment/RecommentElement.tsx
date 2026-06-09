@@ -4,6 +4,7 @@ import {dateConvert} from "@/lib/utils";
 import CommentOption from "@/app/(main)/article/[id]/component/comment/recomment/CommentOption";
 import useDeleteComment from "@/app/(main)/article/[id]/component/comment/useDeleteComment";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import Link from "next/link";
 
 interface RecommentElementProps{
     recomment:ArticleCommentResponse;
@@ -30,7 +31,10 @@ export default function RecommentElement({recomment,articleId,userInfo}:Recommen
                 {userInfo &&
                     <CommentOption onDelete={requestDelete} authorInfo={recomment.author} userInfo={userInfo}/>}
 
-                <span className="text-sm">{recomment.author.nickName}</span>
+
+                    <Link href={`/user/${recomment.author.id}`}>
+                        <span className="text-sm">{recomment.isDeleted? '삭제된 덧글 작성자':recomment.author.nickName}</span>
+                    </Link>
             </div>
             <div className="ml-12 text-sm text-gray-700 dark:text-gray-400">
                 {recomment.text}

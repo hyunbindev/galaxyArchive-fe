@@ -11,10 +11,13 @@ import React, {useEffect, useMemo, useState} from "react";
 import useGetNewArticleList from "@/app/(main)/user/[id]/article/useGetNewArticleList";
 import ArticleSummaryElement from "@/app/(main)/user/[id]/article/ArticleSummaryElement";
 
+interface ArticleListProps{
+    authorId:string;
+}
 
-export default function ArticleList(){
+export default function ArticleList({authorId}:ArticleListProps){
     const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-    const { articleSummeryPage, lastArticleId, requestNextPage } = useGetNewArticleList('5d455a18-4d48-49ad-bfbe-bcd9a90e2c97',10);
+    const { articleSummeryPage, lastArticleId, requestNextPage } = useGetNewArticleList(authorId,10);
 
 
     useEffect(() => {

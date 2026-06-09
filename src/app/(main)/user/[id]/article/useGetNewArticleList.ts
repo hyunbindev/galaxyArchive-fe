@@ -40,9 +40,12 @@ export default function useGetNewArticleList(authorId:string, size:number){
 
             isLoading.current = false;
 
-            lastArticleId.current = res.cursorArticleId;
             setArticleSummeryPage(prev=>[...prev, res.articles]);
-            if(res.hasNextPage) requestNextPage()
+            if(res.hasNextPage){
+                requestNextPage()
+            }else{
+                lastArticleId.current = res.cursorArticleId;
+            }
         }
 
         requestNewArticleFirstPage().catch(e => console.error(e))
@@ -57,7 +60,11 @@ export default function useGetNewArticleList(authorId:string, size:number){
             .params(queryParams)
 
         setArticleSummeryPage(prev=>[...prev, res.articles]);
-        lastArticleId.current = res.cursorArticleId;
+        if(res.hasNextPage){
+            lastArticleId.current = res.cursorArticleId;
+        }else{
+            lastArticleId.current = null;
+        }
         isLoading.current=false;
     }
 

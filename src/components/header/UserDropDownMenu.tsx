@@ -9,8 +9,14 @@ import {
 import {LogOutIcon, MoreVertical, SettingsIcon, UserIcon} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import useUserAuth from "@/components/header/useUserAuth";
+import {UserInfo} from "@/lib/getAuthenticatedUser";
+import Link from "next/link";
 
-export default function UserDropDownMenu(){
+interface UserDropDownMenuProps{
+    userInfo:UserInfo;
+}
+
+export default function UserDropDownMenu({userInfo}:UserDropDownMenuProps){
     const { logout } = useUserAuth();
 
     return (
@@ -21,10 +27,12 @@ export default function UserDropDownMenu(){
                 </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-                <DropdownMenuItem>
-                    <UserIcon />
-                    Profile
-                </DropdownMenuItem>
+                <Link href={`/user/${userInfo.id}`}>
+                    <DropdownMenuItem>
+                        <UserIcon />
+                        Profile
+                    </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem>
                     <SettingsIcon />
                     Settings

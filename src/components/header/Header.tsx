@@ -24,7 +24,7 @@ export async function Header() {
                         <ThemeModeToggle />
                         {userInfo? (
                             <>
-                            <UserDropDownMenu/>
+                            <UserDropDownMenu userInfo={userInfo}/>
                             <Avatar className="h-8 w-8 border border-border/40">
                                 <AvatarImage
                                     src={userInfo.profileImageUrl}

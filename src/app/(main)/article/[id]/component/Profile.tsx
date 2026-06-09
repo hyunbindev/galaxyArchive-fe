@@ -22,7 +22,7 @@ export default function Profile({profileImageUrl, nickName}:ProfileProps){
             </Avatar>
 
             <div className="flex flex-col">
-                <span className="text-lg font-semibold">{nickName}</span>
+                <span>{nickName}</span>
                 {/*{<span className="text-sm text-muted-foreground">bio description</span>}*/}
             </div>
         </div>
