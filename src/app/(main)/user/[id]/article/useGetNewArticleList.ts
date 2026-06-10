@@ -26,7 +26,7 @@ export default function useGetNewArticleList(authorId:string, size:number){
         const requestNewArticleFirstPage = async() =>{
             const queryParams:Record<string,any> = { size : size }
             if(lastArticleId){
-                queryParams['lastArticleId'] = lastArticleId.current? lastArticleId:'';
+                queryParams['lastArticleId'] = lastArticleId.current? lastArticleId.current:'';
             }
             isLoading.current = true;
 
@@ -38,8 +38,8 @@ export default function useGetNewArticleList(authorId:string, size:number){
 
             setArticleSummeryPage(prev=>[...prev, res.articles]);
             if(res.hasNextPage){
-                requestNextPage()
                 lastArticleId.current = res.cursorArticleId;
+                requestNextPage();
             }
         }
 
@@ -50,6 +50,7 @@ export default function useGetNewArticleList(authorId:string, size:number){
         if(lastArticleId==null && isLoading.current) return;
         const queryParams:Record<string,any> = { size : size , lastArticleId : lastArticleId.current }
         isLoading.current = true;
+        
         const res = await lightApi.get<ArticleSummaryPage>(`/api/v1/users/${authorId}/articles`)
             .baseUrl(process.env.INTERNAL_API_URL ? process.env.INTERNAL_API_URL : process.env.NEXT_PUBLIC_API_URL)
             .params(queryParams)
