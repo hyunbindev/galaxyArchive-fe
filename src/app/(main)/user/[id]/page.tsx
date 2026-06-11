@@ -2,7 +2,11 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ArticleList from "@/app/(main)/user/[id]/article/ArticleList";
 import lightApi from "@/lib/ApiClient";
-import {UserInfo} from "@/lib/getAuthenticatedUser";
+import {getAuthenticatedUser, UserInfo} from "@/lib/getAuthenticatedUser";
+import {Pencil} from "lucide-react";
+import {ButtonGroup} from "@/components/ui/button-group";
+import {Button} from "@/components/ui/button";
+import ProfileEdit from "@/app/(main)/user/[id]/profile/ProfileEdit";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -20,7 +24,7 @@ export default async function Page({ params }:PageProps){
     const { id } = await params;
     const userProfile:UserProfile = await lightApi.get<UserProfile>(`/api/v1/users/${id}`)
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL);
-
+    const userInfo = await getAuthenticatedUser()
     return(
         <div className="">
             <div className="py-30 ">
@@ -28,7 +32,7 @@ export default async function Page({ params }:PageProps){
             </div>
             <div className="flex flex-col max-w-7xl mx-auto bg-background">
                 <div className="ml-20">
-                    <div className="relative flex pb-6">
+                    <div className="relative flex justify-between pb-6 min-h-25">
 
                         <div className="absolute top-0 -translate-y-1/2">
                             <Avatar className="h-40 w-40">
@@ -42,9 +46,19 @@ export default async function Page({ params }:PageProps){
 
                         <div className="flex flex-col ml-40 p-3 gap-1">
                             <span className="text-2xl">{userProfile.userInfo.nickName}</span>
-                            <span className="text-muted-foreground text-sm">BackEndDeveloper</span>
+                            <div className="flex flex-col gap-2 justify-center">
+                                <span className="text-muted-foreground text-sm">{userProfile.bio}</span>
+                            </div>
                         </div>
+                        {userInfo?.id == userProfile.userInfo.id &&
+                        <div className="flex items-end mb-1">
+                            <ButtonGroup>
+                                <ProfileEdit/>
+                            </ButtonGroup>
+                        </div>
+                        }
                     </div>
+
 
 
                     <div className="flex divide-x [&>div]:flex [&>div]:flex-col [&>div]:pr-10 [&>div:not(:first-child)]:pl-5">

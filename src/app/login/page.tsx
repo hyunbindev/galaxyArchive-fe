@@ -1,5 +1,6 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from "@/components/ui/card";
 import {Button} from "@/components/ui/button";
+import {DialogOverlay} from "@/components/ui/dialog";
 
 interface PageProps {
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
@@ -13,7 +14,7 @@ export default async function LoginPage({ searchParams }: PageProps){
     const queryString = redirectUrl ? `?redirect=${encodeURIComponent(redirectUrl)}` : '';
 
     return(
-        <div className="flex flex-col items-center justify-center h-screen">
+        <div className="flex flex-col items-center justify-center h-screen backdrop-blur-[3px]">
             <Card className="w-full max-w-md bg-background z-99">
                 <CardHeader>
                     <CardTitle className="text-2xl">GalaxyArchive</CardTitle>
