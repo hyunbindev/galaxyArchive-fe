@@ -12,14 +12,14 @@ export default function Error({ error, reset }: {
 }) {
     return (
         <>
-            <div className="flex flex-col items-center justify-center h-screen">
+            <div className="flex flex-col items-center justify-center h-screen backdrop-blur-[3px]">
                 <Card className="w-full max-w-md bg-background z-99">
                     <CardHeader>
                         <CardTitle className="text-2xl">Article not found</CardTitle>
                         <CardDescription>Oops! I'm lost in the galaxy. It seems the constellation you're searching for has vanished into a deep black hole, or perhaps it was never recorded in our archive.</CardDescription>
                     </CardHeader>
                     <CardContent>
-                        <InputGroup className="sm:w-3/4">
+                        <InputGroup>
                             <InputGroupInput placeholder="Try searching for other articles" />
                             <InputGroupAddon>
                                 <SearchIcon />
@@ -28,7 +28,7 @@ export default function Error({ error, reset }: {
                     </CardContent>
                     <CardFooter className="flex-col items-start">
                         <CardDescription>
-                            <Link className="text-right" href="/">Back to galaxyArchive home.</Link>
+                            <Link className="text-right hover:underline" href="/">Back to galaxyArchive home.</Link>
                         </CardDescription>
                     </CardFooter>
                 </Card>
