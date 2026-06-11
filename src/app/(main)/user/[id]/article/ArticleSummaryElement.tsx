@@ -1,6 +1,7 @@
 import {ArticleSummary} from "@/app/(main)/user/[id]/article/useGetNewArticleList";
 import {dateConvert} from "@/lib/utils";
 import Link from "next/link";
+import {MessageSquare} from "lucide-react";
 
 
 interface ArticleSummaryElementProps{
@@ -17,7 +18,12 @@ export default function ArticleSummaryElement({articleSummary}:ArticleSummaryEle
                     <h3 className="mb-3 line-clamp-2">{articleSummary.title}</h3>
                 </div>
                 <span className="text-sm text-muted-foreground mb-3 line-clamp-3">{articleSummary.description}</span>
-                <span className="text-xs text-muted-foreground">{articleSummary.commentsCount} comments</span>
+
+                <div className="flex text-muted-foreground">
+                    <MessageSquare size={15} className="stroke-current mr-1.5"/>
+                    <span className="text-xs">{articleSummary.commentsCount}</span>
+                </div>
+
             </div>
         </Link>
     )
