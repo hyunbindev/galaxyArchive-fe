@@ -7,9 +7,10 @@ import {Separator} from "@/components/ui/separator";
 interface ProfileProps{
     profileImageUrl?:string;
     nickName?:string;
+    bio?:string;
 }
 
-export default function Profile({profileImageUrl, nickName}:ProfileProps){
+export default function Profile({profileImageUrl, nickName, bio}:ProfileProps){
     return(
         <div className="flex items-center gap-3">
 
@@ -21,9 +22,9 @@ export default function Profile({profileImageUrl, nickName}:ProfileProps){
                 <AvatarFallback>CN</AvatarFallback>
             </Avatar>
 
-            <div className="flex flex-col">
+            <div className="flex flex-col gap-0">
                 <span>{nickName}</span>
-                {/*{<span className="text-sm text-muted-foreground">bio description</span>}*/}
+                <span className="text-xs text-muted-foreground">{bio}</span>
             </div>
         </div>
     )

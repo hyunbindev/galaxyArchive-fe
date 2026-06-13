@@ -1,7 +1,8 @@
+"use client"
+
 import {
     Dialog, DialogClose,
     DialogContent,
-    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogOverlay,
@@ -12,10 +13,21 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Pencil} from "lucide-react";
+import {UserProfile} from "@/app/(main)/user/[id]/page";
+import {cn} from "@/lib/utils";
+import useUserProfileUpdate from "@/app/(main)/user/[id]/profile/useUserProfileUpdate";
+import {useState} from "react";
 
-export default function ProfileEdit(){
+interface ProfileEditProps{
+    userProfile:UserProfile;
+}
+
+
+export default function ProfileEdit({ userProfile }:ProfileEditProps){
+    const [open, setOpen] = useState<boolean>(false);
+    const { userProfileForm , onChangeField , requestUpdate } = useUserProfileUpdate(userProfile, open,setOpen);
     return(
-        <Dialog>
+        <Dialog open={open} onOpenChange={setOpen}>
 
             <DialogTrigger asChild>
                     <Button variant="outline" className="cursor-pointer">
@@ -24,30 +36,32 @@ export default function ProfileEdit(){
             </DialogTrigger>
 
             <DialogOverlay className="fixed inset-0 z-50 backdrop-blur-[2px]"/>
+
+
             <DialogContent className="sm:max-w-sm">
+
                 <DialogHeader>
                     <DialogTitle>Edit profile</DialogTitle>
-                    <DialogDescription>
-                        Make changes to your profile here. Click save when you&apos;re
-                        done.
-                    </DialogDescription>
                 </DialogHeader>
-                <FieldGroup>
-                    <Field>
-                        <Label htmlFor="name">Name</Label>
-                        <Input id="name" name="name" defaultValue="Pedro Duarte" autoComplete="off"/>
+
+                <FieldGroup className={cn("gap-2")}>
+                    <Field className={cn("gap-2")}>
+                        <Label htmlFor="nickName">Name</Label>
+                        <Input id="name" name="nickName" onChange={onChangeField} placeholder="Default NickName" value={userProfileForm.nickName} autoComplete="off"/>
                     </Field>
-                    <Field>
+                    <Field className={cn("gap-2")}>
                         <Label htmlFor="bio">Bio</Label>
-                        <Input id="bio" name="bio" defaultValue="@peduarte" autoComplete="off"/>
+                        <Input id="bio" name="bio" onChange={onChangeField} value={userProfileForm.bio} autoComplete="off"/>
                     </Field>
                 </FieldGroup>
+
                 <DialogFooter>
                     <DialogClose asChild>
                         <Button variant="outline">Cancel</Button>
                     </DialogClose>
-                    <Button type="submit">Save changes</Button>
+                    <Button onClick={requestUpdate}>Save changes</Button>
                 </DialogFooter>
+
             </DialogContent>
         </Dialog>
     )

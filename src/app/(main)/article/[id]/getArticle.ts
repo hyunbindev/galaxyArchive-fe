@@ -15,8 +15,9 @@ export interface Article{
 }
 
 export interface Author{
-    id:string
-    nickName:string
-    profileImageUrl?:string
-    oauth2Provider:string
+    id:string;
+    nickName:string;
+    bio:string;
+    profileImageUrl?:string;
+    oauth2Provider:string;
 }

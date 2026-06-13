@@ -12,8 +12,10 @@ interface PageProps {
     params: Promise<{ id: string }>;
 }
 
-interface UserProfile{
-    userInfo: UserInfo;
+export interface UserProfile{
+    userId:string;
+    nickName:string;
+    userProfileImageUrl:string|null;
     bio:string;
     articleCount:number;
     clusterCount:number;
@@ -22,7 +24,7 @@ interface UserProfile{
 
 export default async function Page({ params }:PageProps){
     const { id } = await params;
-    const userProfile:UserProfile = await lightApi.get<UserProfile>(`/api/v1/users/${id}`)
+    const userProfile:UserProfile = await lightApi.get<UserProfile>(`/api/v1/users/profiles/${id}`)
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL);
     const userInfo = await getAuthenticatedUser()
     return(
@@ -37,7 +39,7 @@ export default async function Page({ params }:PageProps){
                         <div className="absolute top-0 -translate-y-1/2">
                             <Avatar className="h-40 w-40">
                                 <AvatarImage
-                                    src={userProfile.userInfo.profileImageUrl}
+                                    src={userProfile.userProfileImageUrl?userProfile.userProfileImageUrl:""}
                                     alt={"" + "'s profile image"}
                                 />
                                 <AvatarFallback></AvatarFallback>
@@ -45,15 +47,15 @@ export default async function Page({ params }:PageProps){
                         </div>
 
                         <div className="flex flex-col ml-40 p-3 gap-1">
-                            <span className="text-2xl">{userProfile.userInfo.nickName}</span>
+                            <span className="text-2xl">{userProfile.nickName}</span>
                             <div className="flex flex-col gap-2 justify-center">
                                 <span className="text-muted-foreground text-sm">{userProfile.bio}</span>
                             </div>
                         </div>
-                        {userInfo?.id == userProfile.userInfo.id &&
+                        {userInfo?.id == userProfile.userId &&
                         <div className="flex items-end mb-1">
                             <ButtonGroup>
-                                <ProfileEdit/>
+                                <ProfileEdit userProfile={userProfile}/>
                             </ButtonGroup>
                         </div>
                         }

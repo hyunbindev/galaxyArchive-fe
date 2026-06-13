@@ -56,7 +56,7 @@ export default async function Page({params}: { params: { id: string } }) {
 
                         <div className="flex justify-between items-center py-4 mt-4">
                             <Link href={`/user/${article.author.id}`}>
-                                <Profile profileImageUrl={article.author.profileImageUrl} nickName={ article.author.nickName }/>
+                                <Profile profileImageUrl={article.author.profileImageUrl} nickName={ article.author.nickName } bio={ article.author.bio}/>
                             </Link>
                             <ArticleOption article={article}/>
                         </div>
