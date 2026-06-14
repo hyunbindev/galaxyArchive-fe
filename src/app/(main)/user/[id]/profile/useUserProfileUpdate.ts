@@ -7,24 +7,38 @@ import {useRouter} from "next/navigation";
 
 
 interface UserProfileUpdateForm {
+    defaultNickName:string;
     nickName: string;
     bio: string;
 }
 
-
-export default function useUserProfileUpdate(userProfile:UserProfile, open:boolean, setOpen:(v:boolean)=>void){
+export default function useUserProfileUpdate(open:boolean, setOpen:(v:boolean)=>void){
     const router = useRouter();
+
+
+
     const [userProfileForm, setUserProfileForm] = useState<UserProfileUpdateForm>({
-        nickName:userProfile.nickName,
-        bio:userProfile.bio
+        defaultNickName: "",
+        nickName: "",
+        bio: ""
     });
 
     useEffect(()=>{
-        if(open){
+        const getUserEditInfo = async () =>{
+            const res = await lightApi.get<UserProfileUpdateForm>('/api/v1/users/profiles/edit')
+                .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL)
+                .isCredentialRequest(true)
+
             setUserProfileForm({
-                nickName:userProfile.nickName,
-                bio:userProfile.bio
-            });
+                defaultNickName:res.defaultNickName,
+                nickName:res.nickName?res.nickName:res.defaultNickName,
+                bio:res.bio
+            })
+
+        }
+
+        if(open){
+            getUserEditInfo().catch((e)=>console.error(e))
         }
 
     },[open])

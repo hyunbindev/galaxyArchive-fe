@@ -25,7 +25,7 @@ interface ProfileEditProps{
 
 export default function ProfileEdit({ userProfile }:ProfileEditProps){
     const [open, setOpen] = useState<boolean>(false);
-    const { userProfileForm , onChangeField , requestUpdate } = useUserProfileUpdate(userProfile, open,setOpen);
+    const { userProfileForm , onChangeField , requestUpdate } = useUserProfileUpdate(open,setOpen);
     return(
         <Dialog open={open} onOpenChange={setOpen}>
 
@@ -47,7 +47,7 @@ export default function ProfileEdit({ userProfile }:ProfileEditProps){
                 <FieldGroup className={cn("gap-2")}>
                     <Field className={cn("gap-2")}>
                         <Label htmlFor="nickName">Name</Label>
-                        <Input id="name" name="nickName" onChange={onChangeField} placeholder="Default NickName" value={userProfileForm.nickName} autoComplete="off"/>
+                        <Input id="name" name="nickName" onChange={onChangeField} placeholder={userProfileForm.defaultNickName} value={userProfileForm.nickName} autoComplete="off"/>
                     </Field>
                     <Field className={cn("gap-2")}>
                         <Label htmlFor="bio">Bio</Label>
