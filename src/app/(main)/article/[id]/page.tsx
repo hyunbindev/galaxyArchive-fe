@@ -25,6 +25,7 @@ export default async function Page({params}: { params: { id: string } }) {
     }
     const comments = await getComments(numericId)
 
+
     const article: Article = await getArticle(numericId)
 
     const createAtDate: Date = new Date(article.createdAt)

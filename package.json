@@ -27,6 +27,7 @@
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "react-easy-crop": "^6.0.2",
     "remark-parse": "^11.0.0",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",

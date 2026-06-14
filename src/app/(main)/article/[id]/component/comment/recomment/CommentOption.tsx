@@ -8,10 +8,11 @@ import {
 import {Button} from "@/components/ui/button";
 import {MoreVertical, TrashIcon} from "lucide-react";
 import {UserInfo} from "@/lib/getAuthenticatedUser";
+import {CommentAuthor} from "@/app/(main)/article/[id]/component/type";
 
 interface CommentOptionProps{
     userInfo:UserInfo|null;
-    authorInfo:UserInfo;
+    authorInfo:CommentAuthor;
     onDelete:()=>void;
 }
 
@@ -27,7 +28,7 @@ export default function CommentOption({ onDelete,userInfo,authorInfo }:CommentOp
                 <DropdownMenuContent align="end">
                     <DropdownMenuGroup>
 
-                        {authorInfo.id == userInfo?.id && <DropdownMenuItem onClick={onDelete} variant="destructive" className="cursor-pointer text-xs">
+                        {authorInfo.userId == userInfo?.id && <DropdownMenuItem onClick={onDelete} variant="destructive" className="cursor-pointer text-xs">
                             <TrashIcon />
                             Delete
                         </DropdownMenuItem>}

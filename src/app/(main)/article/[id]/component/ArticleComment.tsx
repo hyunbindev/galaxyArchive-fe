@@ -24,7 +24,7 @@ export default function ArticleComment({userInfo, articleId, comments}:ArticleCo
 
             <div>
                 {comments.map((comment, index)=>(
-                    <CommentElement key={comment.id} comment={comment} articleId={articleId} index={index} totalSize={comments.length} authorInfo={comment.author} userInfo={userInfo}/>
+                    <CommentElement key={comment.id} comment={comment} articleId={articleId} index={index} totalSize={comments.length} userInfo={userInfo}/>
                 ))}
             </div>
         </div>

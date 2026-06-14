@@ -19,11 +19,10 @@ interface CommentElementProps{
     comment:ArticleCommentResponse;
     index:number;
     totalSize:number;
-    authorInfo:UserInfo;
     userInfo:UserInfo|null;
 }
 
-export default function CommentElement({ comment , index , totalSize , articleId, authorInfo , userInfo }:CommentElementProps){
+export default function CommentElement({ comment , index , totalSize , articleId , userInfo }:CommentElementProps){
     const [viewReply , setViewReply] = useState<boolean>(false);
 
     useEffect(()=>{
@@ -39,17 +38,17 @@ export default function CommentElement({ comment , index , totalSize , articleId
 
                 <Avatar className="h-9 w-9 border border-border/40 z-1">
                     <AvatarImage
-                        src={comment.author.profileImageUrl}
+                        src={comment.author.userProfileImageUrl}
                         alt={`${comment.author.nickName}'s profile image`}
                     />
                     <AvatarFallback>?</AvatarFallback>
                 </Avatar>
 
-                {!comment.isDeleted && userInfo && <CommentOption onDelete={requestDelete} authorInfo={authorInfo} userInfo={userInfo}/>}
+                {!comment.isDeleted && userInfo && <CommentOption onDelete={requestDelete} authorInfo={comment.author} userInfo={userInfo}/>}
 
                 {comment.isDeleted?
                     <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>:
-                    <Link href={`/user/${comment.author.id}`}>
+                    <Link href={`/user/${comment.author.userId}`}>
                         <span className="text-sm">{comment.isDeleted? '삭제된 덧글 작성자':comment.author.nickName}</span>
                     </Link>
                 }

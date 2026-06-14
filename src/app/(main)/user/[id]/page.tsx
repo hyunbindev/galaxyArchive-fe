@@ -2,10 +2,8 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import ArticleList from "@/app/(main)/user/[id]/article/ArticleList";
 import lightApi from "@/lib/ApiClient";
-import {getAuthenticatedUser, UserInfo} from "@/lib/getAuthenticatedUser";
-import {Pencil} from "lucide-react";
+import {getAuthenticatedUser} from "@/lib/getAuthenticatedUser";
 import {ButtonGroup} from "@/components/ui/button-group";
-import {Button} from "@/components/ui/button";
 import ProfileEdit from "@/app/(main)/user/[id]/profile/ProfileEdit";
 
 interface PageProps {
@@ -27,6 +25,7 @@ export default async function Page({ params }:PageProps){
     const userProfile:UserProfile = await lightApi.get<UserProfile>(`/api/v1/users/profiles/${id}`)
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL);
     const userInfo = await getAuthenticatedUser()
+
     return(
         <div className="">
             <div className="py-30 ">

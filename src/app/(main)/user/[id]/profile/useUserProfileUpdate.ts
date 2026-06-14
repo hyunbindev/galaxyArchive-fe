@@ -1,7 +1,6 @@
 "use client"
 
 import React, {useEffect, useState} from "react";
-import {UserProfile} from "@/app/(main)/user/[id]/page";
 import lightApi from "@/lib/ApiClient";
 import {useRouter} from "next/navigation";
 

@@ -22,7 +22,7 @@ export default function RecommentElement({recomment,articleId,userInfo}:Recommen
             <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9 border border-border/40">
                     <AvatarImage
-                        src={recomment.author.profileImageUrl}
+                        src={recomment.author.userProfileImageUrl}
                         alt={`${recomment.author.nickName}'s profile image`}
                     />
                     <AvatarFallback>CN</AvatarFallback>
@@ -32,7 +32,7 @@ export default function RecommentElement({recomment,articleId,userInfo}:Recommen
                     <CommentOption onDelete={requestDelete} authorInfo={recomment.author} userInfo={userInfo}/>}
 
 
-                    <Link href={`/user/${recomment.author.id}`}>
+                    <Link href={`/user/${recomment.author.userId}`}>
                         <span className="text-sm">{recomment.isDeleted? '삭제된 덧글 작성자':recomment.author.nickName}</span>
                     </Link>
             </div>
