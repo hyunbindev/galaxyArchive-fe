@@ -10,6 +10,7 @@ import ArticleComment from "@/app/(main)/article/[id]/component/ArticleComment";
 import {getComments} from "@/app/(main)/article/[id]/component/comment/recomment/getComment";
 import ArticleOption from "@/app/(main)/article/[id]/component/ArticleOption";
 import Link from "next/link";
+import {Badge} from "@/components/ui/badge";
 //TODO-2. remark-html로 sr-only 정적 HTML 매복,
 //TODO-3. dynamic loading에 스피너/스켈레톤 추가
 
@@ -27,6 +28,8 @@ export default async function Page({params}: { params: { id: string } }) {
 
 
     const article: Article = await getArticle(numericId)
+
+    console.log(article)
 
     const createAtDate: Date = new Date(article.createdAt)
 
@@ -54,8 +57,12 @@ export default async function Page({params}: { params: { id: string } }) {
                     <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth() + 1}.${createAtDate.getDate()}`}</span>
 
                     <h1 className="text-3xl bg-transparent">{ article.title }</h1>
-
-                        <div className="flex justify-between items-center py-4 mt-4">
+                        <div className="flex gap-1 py-3">
+                            {
+                                article.keywords.map((keyword)=>(<Badge key={keyword} className="text-sm px-4 py-1" variant="outline">{keyword}</Badge>))
+                            }
+                        </div>
+                        <div className="flex justify-between items-center py-2">
                             <Link href={`/user/${article.author.id}`}>
                                 <Profile profileImageUrl={article.author.profileImageUrl} nickName={ article.author.nickName } bio={ article.author.bio}/>
                             </Link>

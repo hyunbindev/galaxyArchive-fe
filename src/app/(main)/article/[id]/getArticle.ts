@@ -11,6 +11,7 @@ export interface Article{
     title:string
     author:Author
     text:string
+    keywords:string[]
     createdAt:string
 }
 
