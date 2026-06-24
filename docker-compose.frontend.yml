@@ -1,3 +1,4 @@
+name: "galaxyarchive"
 services:
   galaxy-archive-fe:
     image: ghcr.io/${REPO_LOWER}/galaxy-archive-fe:latest
