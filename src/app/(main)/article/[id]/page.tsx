@@ -47,7 +47,7 @@ export default async function Page({params}: { params: { id: string } }) {
     };
 
     return (
-        <main className="max-w-4xl mx-auto bg-background pb-20 mt-15">
+        <main className="max-w-5xl mx-auto bg-background px-10 pb-20 mt-15">
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{__html: JSON.stringify(jsonLd)}}
@@ -57,9 +57,9 @@ export default async function Page({params}: { params: { id: string } }) {
                     <span className="text-gray-500">{`${createAtDate.getFullYear()}.${createAtDate.getMonth() + 1}.${createAtDate.getDate()}`}</span>
 
                     <h1 className="text-3xl bg-transparent">{ article.title }</h1>
-                        <div className="flex gap-1 py-3">
+                        <div className="flex gap-1 py-3 mt-2">
                             {
-                                article.keywords.map((keyword)=>(<Badge key={keyword} className="text-sm px-4 py-1" variant="outline">{keyword}</Badge>))
+                                article.keywords.map((keyword)=>(<Badge key={keyword} className="text-sm px-4 py-1 text-muted-foreground" variant="outline">{keyword}</Badge>))
                             }
                         </div>
                         <div className="flex justify-between items-center py-2">

@@ -16,6 +16,7 @@
 }
 @theme inline {
   --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
   --color-foreground: var(--foreground);
   --font-sans: "Pretendard Variable", ui-sans-serif, system-ui;
   --font-mono: ui-mono, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -61,6 +62,7 @@
   --radius: 0.625rem;
 
   --background: oklch(1 0 89.876);
+  --background-secondary: oklch(0.983 0.001 17.178);
   --foreground: oklch(0.19 0.002 260);
 
   --card: oklch(1 0 0);
@@ -101,6 +103,7 @@
 
 .dark {
   --background: oklch(0.19 0.002 260);
+  --background-secondary: oklch(0.201 0.002 17.289);
   --foreground: oklch(0.985 0.002 247.839);
 
   --card: oklch(0.21 0.034 264.665);
@@ -162,5 +165,5 @@
   font-family: "Pretendard Variable", sans-serif !important;
 }
 .milkdown .editor {
-  padding: 2rem 0rem !important;
+  padding: 1rem 0rem !important;
 }

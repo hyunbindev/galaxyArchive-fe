@@ -7,6 +7,7 @@ export interface ArticleSummary{
     createdAt:string;
     description:string;
     commentsCount:number;
+    keywords:string[];
 }
 
 export interface ArticleSummaryPage{
