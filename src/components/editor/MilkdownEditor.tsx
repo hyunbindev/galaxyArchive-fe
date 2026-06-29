@@ -51,7 +51,6 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                 editor.action((ctx)=>{
                     const view = ctx.get(editorViewCtx);
                     const {tr} = view.state;
-                    console.log(url)
                     const transaction = tr.setNodeMarkup(pos, undefined, {
                         src: `${process.env.NEXT_PUBLIC_IMAGE_BASE_URL?process.env.NEXT_PUBLIC_IMAGE_BASE_URL:"/image/"}/${url}`,
                     })
@@ -110,6 +109,7 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                 scrollThreshold: 100,
                 scrollMargin: 120,
             }));
+
         });
 
 
