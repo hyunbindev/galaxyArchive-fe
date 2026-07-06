@@ -1,10 +1,9 @@
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
-import {Tabs, TabsList, TabsTrigger} from "@/components/ui/tabs";
-import ArticleList from "@/app/(main)/user/[id]/article/ArticleList";
 import lightApi from "@/lib/ApiClient";
 import {getAuthenticatedUser} from "@/lib/getAuthenticatedUser";
 import {ButtonGroup} from "@/components/ui/button-group";
 import ProfileEdit from "@/app/(main)/user/[id]/profile/ProfileEdit";
+import UserProfileTabs from "@/app/(main)/user/[id]/UserProfileTabs";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -28,7 +27,7 @@ export default async function Page({ params }:PageProps){
 
     return(
         <div className="">
-            <div className="py-30 ">
+            <div className="py-20 ">
 
             </div>
             <div className="flex flex-col max-w-7xl mx-auto bg-background">
@@ -36,7 +35,7 @@ export default async function Page({ params }:PageProps){
                     <div className="relative flex justify-between pb-6 min-h-25">
 
                         <div className="absolute top-0 -translate-y-1/2">
-                            <Avatar className="h-40 w-40">
+                            <Avatar className="h-30 w-30">
                                 <AvatarImage
                                     src={userProfile.userProfileImageUrl?userProfile.userProfileImageUrl:""}
                                     alt={"" + "'s profile image"}
@@ -45,53 +44,29 @@ export default async function Page({ params }:PageProps){
                             </Avatar>
                         </div>
 
-                        <div className="flex flex-col ml-40 p-3 gap-1">
+                        <div className="flex flex-col ml-30 p-3 gap-1">
                             <span className="text-2xl">{userProfile.nickName}</span>
                             <div className="flex flex-col gap-2 justify-center">
                                 <span className="text-muted-foreground text-sm">{userProfile.bio}</span>
                             </div>
                         </div>
-                        {userInfo?.id == userProfile.userId &&
-                        <div className="flex items-end mb-1">
-                            <ButtonGroup>
-                                <ProfileEdit userProfile={userProfile}/>
-                            </ButtonGroup>
-                        </div>
-                        }
-                    </div>
-
-
-
-                    <div className="flex divide-x [&>div]:flex [&>div]:flex-col [&>div]:pr-10 [&>div:not(:first-child)]:pl-5">
-                        <div>
-                            <span>{userProfile.articleCount}</span>
-                            <span className="text-sm text-muted-foreground">Articles</span>
-                        </div>
-                        <div>
-                            <span>{userProfile.connectionCount}</span>
-                            <span className="text-sm text-muted-foreground">Connections</span>
-                        </div>
-                        <div>
-                            <span>{userProfile.clusterCount}</span>
-                            <span className="text-sm text-muted-foreground">Clusters</span>
+                        <div className="flex items-end pb-3 [&>div]:flex [&>div]:flex-col [&>div]:pr-10">
+                            <div>
+                                <span>{userProfile.articleCount}</span>
+                                <span className="text-sm text-muted-foreground">Articles</span>
+                            </div>
+                            <div>
+                                <span>{userProfile.connectionCount}</span>
+                                <span className="text-sm text-muted-foreground">Connections</span>
+                            </div>
+                            <div>
+                                <span>{userProfile.clusterCount}</span>
+                                <span className="text-sm text-muted-foreground">Clusters</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
-
-                <div className="mt-10 ml-10 mb-3">
-                    <Tabs defaultValue="Articles">
-                        <TabsList variant="line">
-                            <TabsTrigger className="text cursor-pointer" value="Articles">Articles</TabsTrigger>
-                            <TabsTrigger className="text cursor-pointer" value="Networks">Networks</TabsTrigger>
-                            <TabsTrigger className="text cursor-pointer" value="Activity">Activity</TabsTrigger>
-                        </TabsList>
-                    </Tabs>
-                </div>
-
-                <div className="mb-20">
-                    <ArticleList authorId={id}/>
-                </div>
+                <UserProfileTabs userId={id} />
             </div>
         </div>
     )
