@@ -46,8 +46,6 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
 
                 <Canvas gl={{antialias: true}} dpr={[1, 1.75]}>
 
-                    <ambientLight intensity={0.55}/>
-                    <directionalLight position={[80, 120, 80]} intensity={1.1}/>
                     <ClusterCameraController
                         bounds={scene.bounds}
                         targetPosition={selectedNode?.position ?? selectedGroup?.centroid ?? null}
@@ -67,15 +65,6 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                 </Canvas>
             </div>
         </section>
-    );
-}
-
-function Metric({label, value}: { label: string; value: string }) {
-    return (
-        <div className="rounded-md border px-3 py-2">
-            <div className="text-xs text-muted-foreground">{label}</div>
-            <div className="mt-1 font-mono text-sm">{value}</div>
-        </div>
     );
 }
 
