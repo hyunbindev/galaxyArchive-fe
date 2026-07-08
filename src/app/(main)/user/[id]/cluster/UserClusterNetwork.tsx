@@ -21,7 +21,7 @@ export default function UserClusterNetwork({ userId }: UserClusterNetworkProps) 
 
     if (error || !snapshot) {
         return (
-            <div className="flex min-h-[360px] flex-col items-center justify-center gap-2 border-y text-center">
+            <div className="flex-1 flex min-h-[360px] flex-col items-center justify-center gap-2 border-y text-center">
                 <h3 className="text-base font-medium">No cluster snapshot</h3>
                 <p className="text-sm text-muted-foreground">
                     This user does not have a completed cluster map yet.
@@ -30,5 +30,5 @@ export default function UserClusterNetwork({ userId }: UserClusterNetworkProps) 
         );
     }
 
-    return <ClusterGraphView snapshot={snapshot} />;
+    return <ClusterGraphView className="flex-1 mb-15" snapshot={snapshot} />;
 }

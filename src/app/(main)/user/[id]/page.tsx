@@ -26,12 +26,12 @@ export default async function Page({ params }:PageProps){
     const userInfo = await getAuthenticatedUser()
 
     return(
-        <div className="">
-            <div className="py-20 ">
+        <div className="h-screen">
+            <div className="flex h-full min-h-0 flex-col max-w-7xl mx-auto bg-background">
+                <div className="py-18 shrink-0">
 
-            </div>
-            <div className="flex flex-col max-w-7xl mx-auto bg-background">
-                <div className="ml-20">
+                </div>
+                <div className="ml-20 shrink-0">
                     <div className="relative flex justify-between pb-6 min-h-25">
 
                         <div className="absolute top-0 -translate-y-1/2">
@@ -66,7 +66,9 @@ export default async function Page({ params }:PageProps){
                         </div>
                     </div>
                 </div>
-                <UserProfileTabs userId={id} />
+                <div className="flex min-h-0 flex-1 flex-col">
+                    <UserProfileTabs userId={id} />
+                </div>
             </div>
         </div>
     )

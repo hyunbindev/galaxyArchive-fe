@@ -37,6 +37,7 @@ export default function ClusterEdgeRender({ nodes, edges, color }: ClusterEdgeRe
                 color={new Three.Color(color)}
                 transparent
                 opacity={0.38}
+                fog
             />
         </lineSegments>
     );

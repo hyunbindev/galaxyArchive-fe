@@ -10,8 +10,8 @@ interface UserProfileTabsProps {
 
 export default function UserProfileTabs({ userId }: UserProfileTabsProps) {
     return (
-        <Tabs defaultValue="Networks">
-            <div className="">
+        <Tabs defaultValue="Networks" className="h-full min-h-0">
+            <div className="flex shrink-0 flex-col">
                 <TabsList variant="line">
                     <TabsTrigger className="text cursor-pointer" value="Networks">Galaxy</TabsTrigger>
                     <TabsTrigger className="text cursor-pointer" value="Articles">Articles</TabsTrigger>
@@ -19,16 +19,16 @@ export default function UserProfileTabs({ userId }: UserProfileTabsProps) {
                 </TabsList>
             </div>
 
-            <TabsContent value="Networks" className="mb-20">
+            <TabsContent value="Networks" className="mb-0 flex min-h-0 flex-col">
                 <UserClusterNetwork userId={userId}/>
             </TabsContent>
 
-            <TabsContent value="Articles" className="mb-20">
+            <TabsContent value="Articles" className="mb-0 flex min-h-0 flex-col">
                 <ArticleList authorId={userId}/>
             </TabsContent>
 
-            <TabsContent value="Activity" className="mb-20">
-                <div className="flex min-h-60 items-center justify-center text-sm text-muted-foreground">
+            <TabsContent value="Activity" className="mb-0 flex min-h-0 flex-col">
+                <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     No activity view yet.
                 </div>
             </TabsContent>

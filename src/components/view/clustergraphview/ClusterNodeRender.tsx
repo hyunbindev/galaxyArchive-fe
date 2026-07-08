@@ -3,7 +3,7 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
-import { Vector3, type Mesh } from "three";
+import { AdditiveBlending, CanvasTexture, Vector3, type Mesh } from "three";
 import { ClusterGroup, ClusterNode } from "@/components/view/clustergraphview/type";
 
 interface ClusterNodeRenderProps {
@@ -42,6 +42,10 @@ export default function ClusterNodeRender({
         () => visibleNodes.find((node) => node.id === hoveredNodeId) ?? null,
         [hoveredNodeId, visibleNodes],
     );
+    const glowTextures = useMemo(
+        () => new Map(visibleGroups.map((group) => [group.clusterId, makeRadialTexture(group.color)])),
+        [visibleGroups],
+    );
 
     useFrame((_, delta) => {
         const alpha = 1 - Math.exp(-delta * 7);
@@ -63,6 +67,22 @@ export default function ClusterNodeRender({
         <group>
             {visibleGroups.map((group) => (
                 <group key={group.clusterId}>
+                    <sprite
+                        position={[group.centroid.x, group.centroid.y, group.centroid.z]}
+                        scale={[
+                            Math.max(10.5, Math.min(15, group.articleCount * 0.32)),
+                            Math.max(10.5, Math.min(15, group.articleCount * 0.32)),
+                            1,
+                        ]}
+                    >
+                        <spriteMaterial
+                            map={glowTextures.get(group.clusterId)}
+                            transparent
+                            opacity={selectedClusterId === group.clusterId ? 1 : 0.72}
+                            depthWrite={false}
+                            blending={AdditiveBlending}
+                        />
+                    </sprite>
                     {selectedClusterId !== group.clusterId && (
                         <mesh
                             position={[group.centroid.x, group.centroid.y, group.centroid.z]}
@@ -72,7 +92,7 @@ export default function ClusterNodeRender({
                             }}
                         >
                             <sphereGeometry args={[Math.max(0.7, Math.min(1.5, group.articleCount * 0.04)), 24, 24]} />
-                            <meshBasicMaterial color={group.color} transparent opacity={0.95} />
+                            <meshBasicMaterial color={group.color} transparent opacity={0.95} fog />
                         </mesh>
                     )}
                 </group>
@@ -120,6 +140,7 @@ export default function ClusterNodeRender({
                             color={node.color}
                             transparent
                             opacity={dimmed ? 0.18 : selected ? 1 : 0.92}
+                            fog
                         />
                     </mesh>
                 );
@@ -146,4 +167,44 @@ export default function ClusterNodeRender({
             )}
         </group>
     );
+}
+
+function makeRadialTexture(color: string) {
+    const size = 256;
+    const canvas = document.createElement("canvas");
+    canvas.width = size;
+    canvas.height = size;
+
+    const context = canvas.getContext("2d");
+    if (!context) {
+        return new CanvasTexture(canvas);
+    }
+
+    const gradient = context.createRadialGradient(
+        size / 2,
+        size / 2,
+        0,
+        size / 2,
+        size / 2,
+        size / 2,
+    );
+
+    gradient.addColorStop(0, toRgba(color, 0.72));
+    gradient.addColorStop(0.28, toRgba(color, 0.34));
+    gradient.addColorStop(0.68, toRgba(color, 0.1));
+    gradient.addColorStop(1, "rgba(0, 0, 0, 0)");
+
+    context.fillStyle = gradient;
+    context.fillRect(0, 0, size, size);
+
+    return new CanvasTexture(canvas);
+}
+
+function toRgba(hex: string, alpha: number) {
+    const value = hex.replace("#", "");
+    const red = Number.parseInt(value.slice(0, 2), 16);
+    const green = Number.parseInt(value.slice(2, 4), 16);
+    const blue = Number.parseInt(value.slice(4, 6), 16);
+
+    return `rgba(${red}, ${green}, ${blue}, ${alpha})`;
 }
