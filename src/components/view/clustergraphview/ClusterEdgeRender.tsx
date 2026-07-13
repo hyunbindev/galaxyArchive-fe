@@ -10,7 +10,11 @@ interface ClusterEdgeRenderProps {
     color: string;
 }
 
-export default function ClusterEdgeRender({ nodes, edges, color }: ClusterEdgeRenderProps) {
+export default function ClusterEdgeRender({
+    nodes,
+    edges,
+    color,
+}: ClusterEdgeRenderProps) {
     const points = useMemo(() => {
         const positionById = new Map(nodes.map((node) => [node.id, node.position]));
         const coordinates: number[] = [];

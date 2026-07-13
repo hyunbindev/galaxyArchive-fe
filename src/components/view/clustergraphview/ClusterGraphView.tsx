@@ -2,7 +2,7 @@
 
 import {Canvas} from "@react-three/fiber";
 import {useMemo, useState} from "react";
-import {Focus, Layers3} from "lucide-react";
+import {Focus} from "lucide-react";
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import ClusterCameraController from "@/components/view/clustergraphview/ClusterCameraController";
@@ -18,29 +18,38 @@ interface ClusterGraphViewProps {
 }
 
 export default function ClusterGraphView({snapshot, className}: ClusterGraphViewProps) {
+    // API snapshot을 Three.js 렌더링에 쓰기 좋은 scene 데이터로 변환합니다.
     const scene = useMemo(() => toClusterScene(snapshot), [snapshot]);
+
+    // 선택 상태는 기본 그래프와 확장 Dialog가 공유해야 하므로 상위에서 관리합니다.
     const [selectedNode, setSelectedNode] = useState<ClusterNode | null>(null);
     const [selectedClusterId, setSelectedClusterId] = useState<number | null>(null);
 
     const selectedGroup = scene.groups.find((group) => group.clusterId === selectedClusterId) ?? null;
-    const visibleEdges = selectedClusterId === null
-        ? []
+
+    // 클러스터 내부 연결선은 클러스터가 선택되었을 때만 보여줍니다.
+    const visibleEdges = selectedClusterId === null ? []
         : scene.edges.filter((edge) => edge.clusterId === selectedClusterId);
 
+    const visibleKeywordNodes = scene.keywordNodes.filter((node) => node.clusterId !== selectedClusterId);
+
     const handleNodeSelect = (node: ClusterNode) => {
+        // 노드를 선택하면 해당 노드가 속한 클러스터도 함께 선택된 상태로 맞춥니다.
         setSelectedNode(node);
         setSelectedClusterId(node.clusterId);
     };
 
     return (
-        <section className={cn("flex min-h-0 flex-1 overflow-hidden bg-background border border-accent rounded-md", className)}>
-            <div className="relative h-full min-h-0 flex-1">
+        <section className={cn(className)}>
+            <div className="relative h-full min-h-0">
+                {/* 카메라가 바라볼 대상은 선택 노드가 우선이고, 없으면 선택 클러스터 중심입니다. */}
                 <ClusterGraphCanvas
                     scene={scene}
                     selectedNode={selectedNode}
                     selectedClusterId={selectedClusterId}
                     targetPosition={selectedNode?.position ?? selectedGroup?.centroid ?? null}
                     visibleEdges={visibleEdges}
+                    visibleKeywordNodes={visibleKeywordNodes}
                     onNodeSelect={handleNodeSelect}
                     onClusterSelect={(clusterId) => {
                         setSelectedClusterId(clusterId);
@@ -53,7 +62,7 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                         <Button
                             variant="outline"
                             size="icon"
-                            className="absolute right-5 top-5 z-10 bg-background/90 shadow-sm backdrop-blur transition-transform hover:scale-105"
+                            className="absolute right-5 bottom-5 z-10 bg-background/90 shadow-sm backdrop-blur transition-transform hover:scale-105"
                         >
                             <Focus className="size-4"/>
                             <span className="sr-only">Expand cluster graph</span>
@@ -61,12 +70,14 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                     </DialogTrigger>
                     <DialogContent className="h-[92vh] w-[96vw] max-w-none gap-0 overflow-hidden p-0 sm:max-w-none">
                         <DialogTitle className="sr-only">Expanded cluster graph</DialogTitle>
+                        {/* Dialog 안의 큰 그래프도 바깥 그래프와 같은 선택/카메라 상태를 사용합니다. */}
                         <ClusterGraphCanvas
                             scene={scene}
                             selectedNode={selectedNode}
                             selectedClusterId={selectedClusterId}
                             targetPosition={selectedNode?.position ?? selectedGroup?.centroid ?? null}
                             visibleEdges={visibleEdges}
+                            visibleKeywordNodes={visibleKeywordNodes}
                             onNodeSelect={handleNodeSelect}
                             onClusterSelect={(clusterId) => {
                                 setSelectedClusterId(clusterId);
@@ -86,6 +97,7 @@ interface ClusterGraphCanvasProps {
     selectedClusterId: number | null;
     targetPosition: ClusterNode["position"] | null;
     visibleEdges: ReturnType<typeof toClusterScene>["edges"];
+    visibleKeywordNodes: ReturnType<typeof toClusterScene>["keywordNodes"];
     onNodeSelect: (node: ClusterNode) => void;
     onClusterSelect: (clusterId: number) => void;
 }
@@ -96,18 +108,12 @@ function ClusterGraphCanvas({
     selectedClusterId,
     targetPosition,
     visibleEdges,
+    visibleKeywordNodes,
     onNodeSelect,
     onClusterSelect,
 }: ClusterGraphCanvasProps) {
     return (
         <div className="relative h-full min-h-0 w-full">
-            <div
-                className="absolute left-5 top-5 z-10 flex items-center gap-2 rounded-md border bg-background/90 px-3 py-2 text-sm shadow-sm backdrop-blur">
-                <Layers3 className="size-4"/>
-                <span>{scene.clusterCount} clusters</span>
-                <span className="text-muted-foreground">{scene.articleCount} articles</span>
-            </div>
-
             <Canvas gl={{antialias: true}} className="h-full w-full" dpr={[1, 1.75]}>
                 <ClusterCameraController
                     bounds={scene.bounds}
@@ -116,6 +122,7 @@ function ClusterGraphCanvas({
                 <ClusterEdgeRender nodes={scene.nodes} edges={visibleEdges} color="#6b7280"/>
                 <ClusterNodeRender
                     nodes={scene.nodes}
+                    keywordNodes={visibleKeywordNodes}
                     groups={scene.groups}
                     selectedNode={selectedNode}
                     selectedClusterId={selectedClusterId}

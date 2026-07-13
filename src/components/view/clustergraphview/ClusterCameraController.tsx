@@ -14,6 +14,8 @@ interface ClusterCameraControllerProps {
 export default function ClusterCameraController({ bounds, targetPosition }: ClusterCameraControllerProps) {
     const cameraRef = useRef<Three.PerspectiveCamera>(null);
     const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
+
+    // 그래프 크기에 맞춰 far plane을 넉넉하게 잡아 멀리 있는 노드가 잘리지 않게 합니다.
     const far = Math.max(1000, Math.max(bounds.radius, 24) * 20);
 
     useEffect(() => {
@@ -21,6 +23,7 @@ export default function ClusterCameraController({ bounds, targetPosition }: Clus
         const controls = controlsRef.current;
         if (!camera || !controls) return;
 
+        // 전체 그래프 bounds가 바뀌면 카메라를 그래프 중심 기준으로 다시 배치합니다.
         const radius = Math.max(bounds.radius, 24);
         camera.position.set(
             bounds.center.x + radius * 1.4,
@@ -37,6 +40,7 @@ export default function ClusterCameraController({ bounds, targetPosition }: Clus
         const controls = controlsRef.current;
         if (!controls || !targetPosition) return;
 
+        // 노드/클러스터 선택 시 OrbitControls의 시선 중심을 선택 대상 쪽으로 부드럽게 이동합니다.
         controls.target.lerp(
             new Three.Vector3(targetPosition.x, targetPosition.y, targetPosition.z),
             0.65,

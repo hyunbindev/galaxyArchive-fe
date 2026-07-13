@@ -3,11 +3,12 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
-import { AdditiveBlending, CanvasTexture, Vector3, type Mesh } from "three";
-import { ClusterGroup, ClusterNode } from "@/components/view/clustergraphview/type";
+import { AdditiveBlending, CanvasTexture, Vector3, type Group } from "three";
+import { ClusterGroup, ClusterKeywordNode, ClusterNode } from "@/components/view/clustergraphview/type";
 
 interface ClusterNodeRenderProps {
     nodes: ClusterNode[];
+    keywordNodes: ClusterKeywordNode[];
     groups: ClusterGroup[];
     selectedNode: ClusterNode | null;
     selectedClusterId: number | null;
@@ -17,15 +18,19 @@ interface ClusterNodeRenderProps {
 
 export default function ClusterNodeRender({
     nodes,
+    keywordNodes,
     groups,
     selectedNode,
     selectedClusterId,
     onNodeSelect,
     onClusterSelect,
 }: ClusterNodeRenderProps) {
-    const nodeMeshRefs = useRef(new Map<number, Mesh>());
+    // useFrame에서 각 노드 mesh 위치를 직접 움직이기 위해 id별 ref를 저장합니다.
+    const nodeGroupRefs = useRef(new Map<number, Group>());
     const targetPosition = useRef(new Vector3());
     const [hoveredNodeId, setHoveredNodeId] = useState<number | null>(null);
+
+    // noise 클러스터/노드는 화면 렌더링 대상에서 제외합니다.
     const visibleGroups = useMemo(
         () => groups.filter((group) => !group.isNoise),
         [groups],
@@ -38,28 +43,38 @@ export default function ClusterNodeRender({
         () => new Map(visibleGroups.map((group) => [group.clusterId, group])),
         [visibleGroups],
     );
+
+    // hover 상태는 id만 저장하고, 실제 표시할 node 객체는 현재 visibleNodes에서 다시 찾습니다.
     const hoveredNode = useMemo(
         () => visibleNodes.find((node) => node.id === hoveredNodeId) ?? null,
         [hoveredNodeId, visibleNodes],
     );
+
+    // 클러스터별 glow sprite에 사용할 radial texture를 클러스터 색상으로 미리 생성합니다.
     const glowTextures = useMemo(
         () => new Map(visibleGroups.map((group) => [group.clusterId, makeRadialTexture(group.color)])),
         [visibleGroups],
     );
 
+    // 노드별 glow sprite는 선택된 클러스터가 펼쳐졌을 때 각 노드 뒤에 붙여 사용합니다.
+    const nodeGlowScale = 10;
+
     useFrame((_, delta) => {
+        // 프레임 간격이 달라도 비슷한 속도로 보이도록 delta 기반 보간 계수를 계산합니다.
         const alpha = 1 - Math.exp(-delta * 7);
 
         visibleNodes.forEach((node) => {
-            const mesh = nodeMeshRefs.current.get(node.id);
+            const nodeGroup = nodeGroupRefs.current.get(node.id);
             const group = groupById.get(node.clusterId);
-            if (!mesh || !group) return;
+            if (!nodeGroup || !group) return;
 
             const expanded = selectedClusterId === node.clusterId;
+
+            // 선택된 클러스터의 노드는 원래 위치로 퍼지고, 나머지는 클러스터 중심에 모입니다.
             const target = expanded ? node.position : group.centroid;
 
             targetPosition.current.set(target.x, target.y, target.z);
-            mesh.position.lerp(targetPosition.current, alpha);
+            nodeGroup.position.lerp(targetPosition.current, alpha);
         });
     });
 
@@ -67,22 +82,25 @@ export default function ClusterNodeRender({
         <group>
             {visibleGroups.map((group) => (
                 <group key={group.clusterId}>
-                    <sprite
-                        position={[group.centroid.x, group.centroid.y, group.centroid.z]}
-                        scale={[
-                            Math.max(10.5, Math.min(15, group.articleCount * 0.32)),
-                            Math.max(10.5, Math.min(15, group.articleCount * 0.32)),
-                            1,
-                        ]}
-                    >
-                        <spriteMaterial
-                            map={glowTextures.get(group.clusterId)}
-                            transparent
-                            opacity={selectedClusterId === group.clusterId ? 1 : 0.72}
-                            depthWrite={false}
-                            blending={AdditiveBlending}
-                        />
-                    </sprite>
+                    {selectedClusterId !== group.clusterId && (
+                        // 클러스터 중심에 부드러운 glow를 깔아 클러스터 덩어리의 위치를 보여줍니다.
+                        <sprite
+                            position={[group.centroid.x, group.centroid.y, group.centroid.z]}
+                            scale={[
+                                group.articleCount * 5,
+                                group.articleCount * 5,
+                                1,
+                            ]}
+                        >
+                            <spriteMaterial
+                                map={glowTextures.get(group.clusterId)}
+                                transparent
+                                opacity={0.72}
+                                depthWrite={false}
+                                blending={AdditiveBlending}
+                            />
+                        </sprite>
+                    )}
                     {selectedClusterId !== group.clusterId && (
                         <mesh
                             position={[group.centroid.x, group.centroid.y, group.centroid.z]}
@@ -98,55 +116,102 @@ export default function ClusterNodeRender({
                 </group>
             ))}
 
+            {keywordNodes.map((keywordNode) => (
+                <group
+                    key={keywordNode.id}
+                    position={[
+                        keywordNode.position.x,
+                        keywordNode.position.y,
+                        keywordNode.position.z,
+                    ]}
+                >
+                    <Html
+                        position={[0, 1.15, 0]}
+                        center
+                        distanceFactor={95}
+                        occlude={false}
+                    >
+                        <div>
+                            {keywordNode.keyword}
+                        </div>
+                    </Html>
+                </group>
+            ))}
+
             {visibleNodes.map((node) => {
+                // 선택된 노드는 크게, 선택되지 않은 다른 클러스터의 노드는 흐리게 표시합니다.
                 const selected = selectedNode?.id === node.id;
                 const dimmed = selectedClusterId !== null && node.clusterId !== selectedClusterId;
+                const expanded = selectedClusterId === node.clusterId;
                 const radius = node.isNoise ? 0.4 : 0.55;
 
                 return (
-                    <mesh
+                    <group
                         key={node.id}
-                        ref={(mesh) => {
-                            if (mesh) {
-                                nodeMeshRefs.current.set(node.id, mesh);
+                        ref={(nodeGroup) => {
+                            if (nodeGroup) {
+                                nodeGroupRefs.current.set(node.id, nodeGroup);
                             } else {
-                                nodeMeshRefs.current.delete(node.id);
+                                nodeGroupRefs.current.delete(node.id);
                             }
                         }}
                         position={[
+                            // 최초 렌더링 시에는 클러스터 중심에서 시작하고 useFrame에서 목표 위치로 이동합니다.
                             groupById.get(node.clusterId)?.centroid.x ?? node.position.x,
                             groupById.get(node.clusterId)?.centroid.y ?? node.position.y,
                             groupById.get(node.clusterId)?.centroid.z ?? node.position.z,
                         ]}
-                        scale={selected ? 1.45 : 1}
-                        onPointerOver={(event) => {
-                            event.stopPropagation();
-                            if (selectedClusterId === node.clusterId) {
-                                setHoveredNodeId(node.id);
-                            }
-                        }}
-                        onPointerOut={() => setHoveredNodeId(null)}
-                        onClick={(event) => {
-                            event.stopPropagation();
-                            if (selectedClusterId === node.clusterId) {
-                                onNodeSelect(node);
-                            } else {
-                                onClusterSelect(node.clusterId);
-                            }
-                        }}
                     >
-                        <sphereGeometry args={[radius, 24, 24]} />
-                        <meshBasicMaterial
-                            color={node.color}
-                            transparent
-                            opacity={dimmed ? 0.18 : selected ? 1 : 0.92}
-                            fog
-                        />
-                    </mesh>
+                        {expanded && (
+                            // 클러스터가 선택되어 노드가 펼쳐졌을 때 각 노드 뒤에 작은 glow를 표시합니다.
+                            <sprite
+                                scale={[
+                                    selected ? nodeGlowScale * 1.35 : nodeGlowScale,
+                                    selected ? nodeGlowScale * 1.35 : nodeGlowScale,
+                                    1,
+                                ]}
+                            >
+                                <spriteMaterial
+                                    map={glowTextures.get(node.clusterId)}
+                                    transparent
+                                    opacity={selected ? 0.86 : 0.48}
+                                    depthWrite={false}
+                                    blending={AdditiveBlending}
+                                />
+                            </sprite>
+                        )}
+                        <mesh
+                            scale={selected ? 1.45 : 1}
+                            onPointerOver={(event) => {
+                                event.stopPropagation();
+                                if (selectedClusterId === node.clusterId) {
+                                    setHoveredNodeId(node.id);
+                                }
+                            }}
+                            onPointerOut={() => setHoveredNodeId(null)}
+                            onClick={(event) => {
+                                event.stopPropagation();
+                                if (selectedClusterId === node.clusterId) {
+                                    onNodeSelect(node);
+                                } else {
+                                    onClusterSelect(node.clusterId);
+                                }
+                            }}
+                        >
+                            <sphereGeometry args={[radius, 24, 24]} />
+                            <meshBasicMaterial
+                                color={node.color}
+                                transparent
+                                opacity={dimmed ? 0.18 : selected ? 1 : 0.92}
+                                fog
+                            />
+                        </mesh>
+                    </group>
                 );
             })}
 
             {(hoveredNode || (selectedNode && !selectedNode.isNoise)) && (
+                // hover 중인 노드가 있으면 hover가 우선이고, 없으면 선택된 노드 라벨을 보여줍니다.
                 <Html
                     position={[
                         (hoveredNode ?? selectedNode)!.position.x,
@@ -170,6 +235,7 @@ export default function ClusterNodeRender({
 }
 
 function makeRadialTexture(color: string) {
+    // spriteMaterial에 넣을 canvas texture를 만들어 클러스터 glow 효과로 사용합니다.
     const size = 256;
     const canvas = document.createElement("canvas");
     canvas.width = size;

@@ -30,5 +30,9 @@ export default function UserClusterNetwork({ userId }: UserClusterNetworkProps) 
         );
     }
 
-    return <ClusterGraphView className="flex-1 mb-15" snapshot={snapshot} />;
+    return (
+        <div className="flex flex-col h-full">
+            <ClusterGraphView className="flex-1" snapshot={snapshot} />
+        </div>
+    )
 }
