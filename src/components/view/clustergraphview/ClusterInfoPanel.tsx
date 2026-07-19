@@ -55,7 +55,7 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
                 </div>
                 <ul className="flex flex-col gap-2 overflow-y-scroll no-scrollbar">
                     {articleSummary.map((summary)=>(
-                        <li id={`cluster-article-${summary.id}`} onClick={()=>selectNode(summary.id)} key={summary.id} className={cn("border border-accent flex flex-col gap-1 rounded-sm p-3 select-none cursor-pointer hover:bg-secondary",(summary.id === selectedNode?.id) && "bg-secondary")}>
+                        <li id={`cluster-article-${summary.id}`} onClick={()=>selectNode(summary.id)} key={summary.id} className={cn("border border-accent flex flex-col gap-1 rounded-sm p-3 select-none cursor-pointer hover:bg-secondary transition-all duration-500",(summary.id === selectedNode?.id) && "bg-secondary")}>
                             <div className="flex justify-between items-center">
                                 <h2 className="text-sm">{summary.title}</h2>
                                 <span className="text-xs text-muted-foreground">{dateConvert(summary.createdAt)}</span>
