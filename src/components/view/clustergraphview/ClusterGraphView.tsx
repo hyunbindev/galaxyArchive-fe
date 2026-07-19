@@ -11,6 +11,8 @@ import ClusterNodeRender from "@/components/view/clustergraphview/ClusterNodeRen
 import {ClusterNode, UserClusterSnapshot} from "@/components/view/clustergraphview/type";
 import {toClusterScene} from "@/components/view/clustergraphview/toClusterScene";
 import {cn} from "@/lib/utils";
+import {Card, CardHeader, CardTitle} from "@/components/ui/card";
+import ClusterInfoPanel from "@/components/view/clustergraphview/ClusterInfoPanel";
 
 interface ClusterGraphViewProps {
     snapshot: UserClusterSnapshot;
@@ -42,7 +44,16 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
     return (
         <section className={cn(className)}>
             <div className="relative h-full min-h-0">
+                <ClusterInfoPanel
+                    scene={scene}
+                    selectedClusterId={selectedClusterId}
+                    setSelectedClusterId={setSelectedClusterId}
+                    visibleKeywordNodes={visibleKeywordNodes}
+                    selectedNode={selectedNode}
+                    onNodeSelect={handleNodeSelect}
+                />
                 {/* 카메라가 바라볼 대상은 선택 노드가 우선이고, 없으면 선택 클러스터 중심입니다. */}
+                <div className="h-full z-0">
                 <ClusterGraphCanvas
                     scene={scene}
                     selectedNode={selectedNode}
@@ -56,36 +67,8 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                         setSelectedNode(null);
                     }}
                 />
+                </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button
-                            variant="outline"
-                            size="icon"
-                            className="absolute right-5 bottom-5 z-10 bg-background/90 shadow-sm backdrop-blur transition-transform hover:scale-105"
-                        >
-                            <Focus className="size-4"/>
-                            <span className="sr-only">Expand cluster graph</span>
-                        </Button>
-                    </DialogTrigger>
-                    <DialogContent className="h-[92vh] w-[96vw] max-w-none gap-0 overflow-hidden p-0 sm:max-w-none">
-                        <DialogTitle className="sr-only">Expanded cluster graph</DialogTitle>
-                        {/* Dialog 안의 큰 그래프도 바깥 그래프와 같은 선택/카메라 상태를 사용합니다. */}
-                        <ClusterGraphCanvas
-                            scene={scene}
-                            selectedNode={selectedNode}
-                            selectedClusterId={selectedClusterId}
-                            targetPosition={selectedNode?.position ?? selectedGroup?.centroid ?? null}
-                            visibleEdges={visibleEdges}
-                            visibleKeywordNodes={visibleKeywordNodes}
-                            onNodeSelect={handleNodeSelect}
-                            onClusterSelect={(clusterId) => {
-                                setSelectedClusterId(clusterId);
-                                setSelectedNode(null);
-                            }}
-                        />
-                    </DialogContent>
-                </Dialog>
             </div>
         </section>
     );

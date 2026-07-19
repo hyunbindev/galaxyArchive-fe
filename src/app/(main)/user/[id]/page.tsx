@@ -2,12 +2,9 @@ import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import lightApi from "@/lib/ApiClient";
 import {getAuthenticatedUser} from "@/lib/getAuthenticatedUser";
 
-import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
 import UserClusterNetwork from "@/app/(main)/user/[id]/cluster/UserClusterNetwork";
-import ArticleList from "@/app/(main)/user/[id]/article/ArticleList";
 
 interface PageProps {
-    // Next.js dynamic route에서 전달되는 user id입니다. app router에서는 params가 Promise 형태로 들어올 수 있습니다.
     params: Promise<{ id: string }>;
 }
 
@@ -34,7 +31,7 @@ export default async function Page({ params }:PageProps){
     const userInfo = await getAuthenticatedUser()
 
     return(
-        <div className="h-screen w-screen flex py-15">
+        <div className="h-screen w-screen flex pt-15">
             {/* 왼쪽 사이드바: 프로필 이미지, 닉네임, 소개, 통계 영역 */}
             <aside className="w-xs flex flex-col items-center py-25">
                 <div className="flex flex-col gap-3 items-center justify-center">
@@ -62,7 +59,9 @@ export default async function Page({ params }:PageProps){
 
             {/* 오른쪽 메인 영역: 사용자의 클러스터 네트워크를 렌더링합니다. */}
             <div className="flex-1 flex flex-col">
-                <UserClusterNetwork userId={userProfile.userId}/>
+                <div className="h-full w-full">
+                    <UserClusterNetwork userId={userProfile.userId}/>
+                </div>
             </div>
         </div>
     )

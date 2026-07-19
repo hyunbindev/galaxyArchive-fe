@@ -5,6 +5,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef, useState } from "react";
 import { AdditiveBlending, CanvasTexture, Vector3, type Group } from "three";
 import { ClusterGroup, ClusterKeywordNode, ClusterNode } from "@/components/view/clustergraphview/type";
+import {cn} from "@/lib/utils";
 
 interface ClusterNodeRenderProps {
     nodes: ClusterNode[];
@@ -130,8 +131,9 @@ export default function ClusterNodeRender({
                         center
                         distanceFactor={95}
                         occlude={false}
+                        zIndexRange={[1, 0]}
                     >
-                        <div>
+                        <div className="whitespace-nowrap">
                             {keywordNode.keyword}
                         </div>
                     </Html>
@@ -206,30 +208,23 @@ export default function ClusterNodeRender({
                                 fog
                             />
                         </mesh>
+                        {expanded &&
+                            <Html
+                                position={[0, 1.1, 0]}
+                                center occlude={false}
+                                distanceFactor={95}
+                                style={{ pointerEvents: "none" }}
+                                zIndexRange={[1, 0]}>
+                                <div className="-translate-y-4">
+                                    <div className={cn("truncate text-xs text-center font-light select-none",selectedNode !== node && "opacity-40 w-48 text-sm")}>
+                                        {node.title}
+                                    </div>
+                                </div>
+                            </Html>
+                        }
                     </group>
                 );
             })}
-
-            {(hoveredNode || (selectedNode && !selectedNode.isNoise)) && (
-                // hover 중인 노드가 있으면 hover가 우선이고, 없으면 선택된 노드 라벨을 보여줍니다.
-                <Html
-                    position={[
-                        (hoveredNode ?? selectedNode)!.position.x,
-                        (hoveredNode ?? selectedNode)!.position.y + 5,
-                        (hoveredNode ?? selectedNode)!.position.z,
-                    ]}
-                    center
-                    distanceFactor={95}
-                    occlude={false}
-                >
-                    <div className="max-w-80 rounded-md border bg-background/95 px-2.5 py-1.5 text-xs shadow-md backdrop-blur">
-                        <div className="whitespace-normal break-words font-medium">{(hoveredNode ?? selectedNode)!.title}</div>
-                        <div className="mt-0.5 text-[11px] text-muted-foreground">
-                            {(hoveredNode ?? selectedNode)!.isNoise ? "Noise" : `Cluster ${(hoveredNode ?? selectedNode)!.label}`}
-                        </div>
-                    </div>
-                </Html>
-            )}
         </group>
     );
 }

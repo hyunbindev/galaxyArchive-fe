@@ -5,6 +5,7 @@ import type { ElementRef } from "react";
 import { useEffect, useRef } from "react";
 import * as Three from "three";
 import { ClusterBounds, Point3D } from "@/components/view/clustergraphview/type";
+import { useFrame } from "@react-three/fiber";
 
 interface ClusterCameraControllerProps {
     bounds: ClusterBounds;
@@ -14,6 +15,7 @@ interface ClusterCameraControllerProps {
 export default function ClusterCameraController({ bounds, targetPosition }: ClusterCameraControllerProps) {
     const cameraRef = useRef<Three.PerspectiveCamera>(null);
     const controlsRef = useRef<ElementRef<typeof OrbitControls>>(null);
+    const targetRef = useRef<Three.Vector3>(null);
 
     // 그래프 크기에 맞춰 far plane을 넉넉하게 잡아 멀리 있는 노드가 잘리지 않게 합니다.
     const far = Math.max(1000, Math.max(bounds.radius, 24) * 20);
@@ -36,21 +38,32 @@ export default function ClusterCameraController({ bounds, targetPosition }: Clus
         controls.update();
     }, [bounds]);
 
+
     useEffect(() => {
         const controls = controlsRef.current;
         if (!controls || !targetPosition) return;
 
-        // 노드/클러스터 선택 시 OrbitControls의 시선 중심을 선택 대상 쪽으로 부드럽게 이동합니다.
-        controls.target.lerp(
-            new Three.Vector3(targetPosition.x, targetPosition.y, targetPosition.z),
-            0.65,
-        );
-        controls.update();
+        targetRef.current = new Three.Vector3(targetPosition.x, targetPosition.y, targetPosition.z)
+
     }, [targetPosition]);
+
+    useFrame(()=>{
+        const controls = controlsRef.current;
+        const target = targetRef.current;
+        if(!controls || !target) return;
+
+        if (controls.target.distanceTo(target) < 0.01) {
+            controls.target.copy(target);
+            targetRef.current = null;
+        }
+
+        controls.target.lerp(target, 0.08);
+        controls.update()
+    })
 
     return (
         <>
-            <PerspectiveCamera ref={cameraRef} makeDefault fov={46} near={0.1} far={far} />
+            <PerspectiveCamera ref={cameraRef} makeDefault fov={46} near={0.01} far={far} />
             <OrbitControls
                 ref={controlsRef}
                 enableDamping

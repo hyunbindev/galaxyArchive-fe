@@ -1,0 +1,99 @@
+import {cn, dateConvert} from "@/lib/utils";
+import {Badge} from "@/components/ui/badge";
+import {ClusterKeywordNode, ClusterNode} from "@/components/view/clustergraphview/type";
+import {MessageSquare, X} from "lucide-react";
+import useGetClusterArticleSummary from "@/components/view/clustergraphview/useGetClusterArticleSummary";
+import Link from "next/link";
+import {toClusterScene} from "@/components/view/clustergraphview/toClusterScene";
+import {useEffect} from "react";
+
+interface ClusterInfoPanelProps{
+    scene: ReturnType<typeof toClusterScene>;
+    className?: string;
+    selectedClusterId:number|null;
+    setSelectedClusterId: (node: number|null) => void;
+    visibleKeywordNodes:ClusterKeywordNode[];
+    selectedNode:ClusterNode|null;
+    onNodeSelect: (node: ClusterNode) => void;
+}
+
+export default function ClusterInfoPanel({scene, onNodeSelect, className,selectedClusterId, setSelectedClusterId, visibleKeywordNodes, selectedNode}:ClusterInfoPanelProps){
+    const articleSummary = useGetClusterArticleSummary(selectedClusterId);
+
+    const selectNode = (articleId:number)=>{
+        const node = scene.nodes.find((node)=>node.id === articleId);
+
+        if(!node) return;
+
+        onNodeSelect(node);
+    }
+
+    useEffect(() => {
+        if (!selectedNode?.id) return;
+        if (selectedNode.clusterId !== selectedClusterId) return;
+
+        document
+            .getElementById(`cluster-article-${selectedNode.id}`)
+            ?.scrollIntoView({block: "nearest", behavior: "smooth"});
+    }, [selectedNode?.id, selectedNode?.clusterId, selectedClusterId, articleSummary]);
+
+    if(selectedClusterId === null){
+        return null;
+    }
+
+    return(
+        <aside className={cn("absolute right-0 p-5 flex h-full justify-start",className)}>
+            <div className="border border-accent flex flex-col px-3 rounded-sm w-100 h-full p-2 bg-background z-2">
+                <div className="flex justify-between py-2">
+                    <span>Cluster</span>
+                    <button className="cursor-pointer" type="button" onClick={()=> {setSelectedClusterId(null)}} aria-label="close">
+                        <X className="size-5" />
+                    </button>
+                </div>
+                <div className="flex gap-2 py-2">
+                    {visibleKeywordNodes.map((keyword)=>(<Badge key={keyword.keyword} className="text-xs py-0.5 text-muted-foreground" variant="outline">{keyword.keyword}</Badge>))}
+                </div>
+                <ul className="flex flex-col gap-2 overflow-y-scroll no-scrollbar">
+                    {articleSummary.map((summary)=>(
+                        <li id={`cluster-article-${summary.id}`} onClick={()=>selectNode(summary.id)} key={summary.id} className={cn("border border-accent flex flex-col gap-1 rounded-sm p-3 select-none cursor-pointer hover:bg-secondary",(summary.id === selectedNode?.id) && "bg-secondary")}>
+                            <div className="flex justify-between items-center">
+                                <h2 className="text-sm">{summary.title}</h2>
+                                <span className="text-xs text-muted-foreground">{dateConvert(summary.createdAt)}</span>
+                            </div>
+                            <div>
+                                <p className="text-xs text-muted-foreground break-words px-0.5">{summary.description}...</p>
+                            </div>
+                            <div className="flex flex-col justify-between gap-2 pt-1">
+                                <div className="flex flex-wrap gap-1">
+                                    {summary.keywords.map((keyword)=>(
+                                        <Badge
+                                            key={keyword}
+                                            className="text-xs text-muted-foreground truncate"
+                                            variant="outline">
+                                            {keyword}
+                                        </Badge>
+                                    ))}
+                                </div>
+                                {summary.id === selectedNode?.id &&
+                                <div className="flex justify-between border-t border-accent pt-2 px-2">
+                                    <div className="flex text-muted-foreground items-center">
+                                        <MessageSquare size={12} className="stroke-current mr-1.5"/>
+                                        <span className="text-xs">{summary.commentsCount}</span>
+                                    </div>
+                                    <Link
+                                        href={`/article/${summary.id}`}
+                                        onClick={(event) => event.stopPropagation()}
+                                        className="shrink-0 rounded-sm border border-accent px-3 py-1 text-xs hover:bg-background hover:text-foreground"
+                                    >
+                                        Explore
+                                    </Link>
+                                </div>
+                                }
+                            </div>
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </aside>
+    )
+}
