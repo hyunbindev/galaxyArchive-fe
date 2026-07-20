@@ -47,11 +47,11 @@ export default async function Page({ params }:PageProps){
 
                 <div className="flex divide-x border-muted-foreground w-full my-5">
                     <div className="flex-1 flex flex-col items-center">
-                        <span className="text-md">415</span>
+                        <span className="text-md">{userProfile.articleCount}</span>
                         <span className="text-xs text-muted-foreground">Articles</span>
                     </div>
                     <div className="flex-1 flex flex-col items-center">
-                        <span className="text-md">18</span>
+                        <span className="text-md">{userProfile.clusterCount}</span>
                         <span className="text-xs text-muted-foreground">Clusters</span>
                     </div>
                 </div>
