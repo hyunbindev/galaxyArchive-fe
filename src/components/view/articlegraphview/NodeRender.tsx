@@ -82,13 +82,6 @@ export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEv
             mesh.setMatrixAt(index, dummy.matrix);
 
             mesh.setColorAt(index, colorDefault);
-
-            // 클릭시 노드색 변경 비활성화
-            // if (selectedNode !== null && node.id === selectedNode.id) {
-            //     mesh.setColorAt(index, colorSelected);
-            // } else {
-            //     mesh.setColorAt(index, colorDefault);
-            // }
         });
 
         mesh.count = nodes.length;

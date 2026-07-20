@@ -7,7 +7,6 @@ export interface UserClusterSnapshot {
     clustersCount?: number;
     clusterCount?: number;
     articleCount: number;
-    keyWords?: string[];
 }
 
 // 하나의 클러스터와 그 안에 속한 article 목록입니다.
@@ -17,8 +16,13 @@ export interface UserCluster {
     articleCount: number;
     isNoise: boolean;
     clusterArticles: ClusterArticle[];
-    keyWords?: string[];
-    keywords?: string[];
+    keywords: ClusterKeyWord[];
+}
+
+export interface ClusterKeyWord {
+    clusterId: number;
+    keyword: string;
+    similarity: number;
 }
 
 // 클러스터 그래프에서 하나의 article이 가진 원본 좌표와 메타데이터입니다.

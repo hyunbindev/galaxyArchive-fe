@@ -187,18 +187,19 @@ export function toClusterScene(snapshot: UserClusterSnapshot): ClusterScene {
             label: cluster.label,
             isNoise: cluster.isNoise,
             articleCount: cluster.articleCount,
-            keywords: cluster.keywords ?? cluster.keyWords ?? [],
+            keywords: cluster.keywords?.map((clusterKeyword)=>clusterKeyword.keyword) ??  [],
             color,
             centroid: centerOf(groupNodes.map((node) => node.position)),
             nodeIds: groupNodes.map((node) => node.id),
         };
     });
-
+    //키워느 노드 생성
     const keywordNodes: ClusterKeywordNode[] = groups.flatMap((group) => {
         if (group.isNoise) return [];
 
         const radius = Math.max(5.5, Math.min(11, group.articleCount * 0.18));
         const keywords = group.keywords.slice(0, MAX_KEYWORDS_PER_CLUSTER);
+
 
         return keywords.map((keyword, keywordIndex) => {
             const angle = (Math.PI * 2 * keywordIndex) / Math.max(1, keywords.length) - Math.PI / 2;

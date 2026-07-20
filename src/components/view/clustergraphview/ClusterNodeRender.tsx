@@ -133,7 +133,7 @@ export default function ClusterNodeRender({
                         occlude={false}
                         zIndexRange={[1, 0]}
                     >
-                        <div className="whitespace-nowrap">
+                        <div className="whitespace-nowrap text-xs opacity-40 select-none" style={{"color":keywordNode.color}}>
                             {keywordNode.keyword}
                         </div>
                     </Html>
@@ -216,7 +216,7 @@ export default function ClusterNodeRender({
                                 style={{ pointerEvents: "none" }}
                                 zIndexRange={[1, 0]}>
                                 <div className="-translate-y-4">
-                                    <div className={cn("truncate text-xs text-center font-light select-none",selectedNode !== node && "opacity-40 w-48 text-sm")}>
+                                    <div className={cn("truncate text-xs text-center font-light select-none",selectedNode !== node && "opacity-30 w-48 text-sm")}>
                                         {node.title}
                                     </div>
                                 </div>

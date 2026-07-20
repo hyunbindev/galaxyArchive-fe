@@ -1,11 +1,14 @@
+"use client"
 import {cn, dateConvert} from "@/lib/utils";
 import {Badge} from "@/components/ui/badge";
 import {ClusterKeywordNode, ClusterNode} from "@/components/view/clustergraphview/type";
 import {MessageSquare, X} from "lucide-react";
 import useGetClusterArticleSummary from "@/components/view/clustergraphview/useGetClusterArticleSummary";
-import Link from "next/link";
+
 import {toClusterScene} from "@/components/view/clustergraphview/toClusterScene";
 import {useEffect} from "react";
+import {useRouter} from "next/navigation";
+
 
 interface ClusterInfoPanelProps{
     scene: ReturnType<typeof toClusterScene>;
@@ -20,6 +23,7 @@ interface ClusterInfoPanelProps{
 export default function ClusterInfoPanel({scene, onNodeSelect, className,selectedClusterId, setSelectedClusterId, visibleKeywordNodes, selectedNode}:ClusterInfoPanelProps){
     const articleSummary = useGetClusterArticleSummary(selectedClusterId);
 
+    const router = useRouter();
     const selectNode = (articleId:number)=>{
         const node = scene.nodes.find((node)=>node.id === articleId);
 
@@ -28,9 +32,15 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
         onNodeSelect(node);
     }
 
+    const navigateArticle = (articleId:number) =>{
+        if(selectedNode?.id !== articleId) return;
+        router.push(`/article/${articleId}`)
+    }
+
     useEffect(() => {
         if (!selectedNode?.id) return;
         if (selectedNode.clusterId !== selectedClusterId) return;
+
 
         document
             .getElementById(`cluster-article-${selectedNode.id}`)
@@ -59,7 +69,10 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
 
                 <ul className="flex flex-col gap-2 overflow-y-scroll no-scrollbar">
                     {articleSummary.map((summary)=>(
-                        <li id={`cluster-article-${summary.id}`} onClick={()=>selectNode(summary.id)} key={summary.id} className={cn("border border-accent flex flex-col gap-1 rounded-sm p-3 select-none cursor-pointer hover:bg-secondary transition-all duration-500",(summary.id === selectedNode?.id) && "bg-secondary")}>
+                        <li id={`cluster-article-${summary.id}`} onClick={()=> {
+                            selectNode(summary.id);
+                            navigateArticle(summary.id);
+                        }} key={summary.id} className={cn("border border-accent flex flex-col gap-1 rounded-sm p-3 select-none cursor-pointer hover:bg-secondary transition-all duration-500",(summary.id === selectedNode?.id) && "bg-secondary")}>
 
                             <div className="flex justify-between items-center">
                                 <h2 className="text-sm">{summary.title}</h2>
@@ -89,16 +102,7 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
                                         <MessageSquare size={12} className="stroke-current mr-1.5"/>
                                         <span className="text-xs">{summary.commentsCount}</span>
                                     </div>
-
-                                    <Link
-                                        href={`/article/${summary.id}`}
-                                        onClick={(event) => event.stopPropagation()}
-                                        className="shrink-0 rounded-sm border border-accent px-3 py-1 text-xs hover:bg-background hover:text-foreground">
-                                        Explore
-                                    </Link>
-
-                                </div>
-                                }
+                                </div>}
                             </div>
                         </li>
                     ))}
