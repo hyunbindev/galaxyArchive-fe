@@ -29,7 +29,7 @@ export default async function Page({params}: { params: { id: string } }) {
 
     const article: Article = await getArticle(numericId)
 
-    console.log(article)
+    //console.log(article)
 
     const createAtDate: Date = new Date(article.createdAt)
 

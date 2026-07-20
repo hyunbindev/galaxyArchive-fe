@@ -159,7 +159,6 @@ export default function NodeRender({ nodes, nodeColor, titleColor, onNodeClickEv
 
                         if (clickNode) {
                             onNodeClickEvent(clickNode);
-                            console.log(clickNode)
                         }
                     }
                 }}

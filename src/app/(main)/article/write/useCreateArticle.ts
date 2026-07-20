@@ -78,7 +78,6 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     });
                 }
             })
-            console.log(response)
 
 
             return response.data
@@ -118,7 +117,6 @@ export default function useCreateArticle(ref:RefObject<MilkdownEditorRef|null>){
                     const { imageRawKey, imageUUID } = await uploadImage(pos,blobUrl);
                     if(!ref.current) return;
 
-                    console.log(imageRawKey)
 
                     ref.current.changeImageUrl(pos,imageRawKey);
                     uploadedUuids.push(imageUUID)

@@ -133,7 +133,7 @@ export default function ClusterNodeRender({
                         occlude={false}
                         zIndexRange={[1, 0]}
                     >
-                        <div className="whitespace-nowrap text-xs opacity-40 select-none" style={{"color":keywordNode.color}}>
+                        <div className="whitespace-nowrap text-xs font-medium opacity-40 select-none" style={{"color":keywordNode.color}}>
                             {keywordNode.keyword}
                         </div>
                     </Html>

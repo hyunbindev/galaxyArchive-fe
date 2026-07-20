@@ -16,7 +16,6 @@ export default function useGetUserCluster(userId: string) {
             .get<UserClusterSnapshot>(`/api/v1/clusters/users/${userId}`)
             .baseUrl(process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL)
             .then((response) => {
-                console.log(response)
                 if (!canceled) setSnapshot(response);
             })
             .catch((err) => {

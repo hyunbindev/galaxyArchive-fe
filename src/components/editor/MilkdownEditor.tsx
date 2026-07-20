@@ -38,7 +38,6 @@ const MilkdownEditor = forwardRef<MilkdownEditorRef, Props>((props,ref)=> {
                     doc.descendants((node, pos) => {
 
                         if (node.type.name == 'image-block') imageMap.set(pos, node.attrs.src);
-                        console.log(node);
                     })
 
                     return imageMap;

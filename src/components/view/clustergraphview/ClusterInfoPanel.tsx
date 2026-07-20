@@ -53,7 +53,7 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
 
     return(
         <aside className={cn("absolute right-0 p-5 flex h-full justify-start",className)}>
-            <div className="border border-accent flex flex-col px-3 rounded-sm w-100 h-full p-2 bg-background z-2">
+            <div className="border border-accent flex flex-col px-3 rounded-sm w-100 h-full p-2 bg-background/70 backdrop-blur-md z-2">
                 <div className="flex justify-between py-2">
                     <span>Cluster</span>
                     <button className="cursor-pointer" type="button" onClick={()=> {setSelectedClusterId(null)}} aria-label="close">
