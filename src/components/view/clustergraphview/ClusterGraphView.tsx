@@ -48,7 +48,7 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                     scene={scene}
                     selectedClusterId={selectedClusterId}
                     setSelectedClusterId={setSelectedClusterId}
-                    visibleKeywordNodes={visibleKeywordNodes}
+                    visibleKeywordNodes={scene.keywordNodes}
                     selectedNode={selectedNode}
                     onNodeSelect={handleNodeSelect}
                 />
