@@ -1,17 +1,14 @@
 "use client";
+import {MouseLeft, Grip, Move, Move3D, ZoomIn, ZoomOut, MouseRight,} from "lucide-react";
 
 import {Canvas} from "@react-three/fiber";
 import {useMemo, useState} from "react";
-import {Focus} from "lucide-react";
-import {Button} from "@/components/ui/button";
-import {Dialog, DialogContent, DialogTitle, DialogTrigger} from "@/components/ui/dialog";
 import ClusterCameraController from "@/components/view/clustergraphview/ClusterCameraController";
 import ClusterEdgeRender from "@/components/view/clustergraphview/ClusterEdgeRender";
 import ClusterNodeRender from "@/components/view/clustergraphview/ClusterNodeRender";
 import {ClusterNode, UserClusterSnapshot} from "@/components/view/clustergraphview/type";
 import {toClusterScene} from "@/components/view/clustergraphview/toClusterScene";
 import {cn} from "@/lib/utils";
-import {Card, CardHeader, CardTitle} from "@/components/ui/card";
 import ClusterInfoPanel from "@/components/view/clustergraphview/ClusterInfoPanel";
 
 interface ClusterGraphViewProps {
@@ -43,7 +40,32 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
 
     return (
         <section className={cn(className)}>
-            <div className="relative h-full min-h-0">
+            <div className="relative h-full min-h-0 overflow-hidden">
+                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 top-3 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300",(selectedGroup !== null)&&"opacity-0 -translate-y-10" )}>
+                    <span>{snapshot.clusters.filter((cluster)=>!cluster.isNoise).length} clusters</span>
+                    <span>
+                    {snapshot.clusters
+                        .filter((cluster) => !cluster.isNoise)
+                        .reduce((sum, cluster) => sum + cluster.articleCount, 0)} articles
+                    </span>
+                    <span>
+                    {snapshot.clusters
+                        .filter((cluster) => !cluster.isNoise)
+                        .reduce((sum, cluster) => sum + cluster.articleCount-1, 0)} connections
+                    </span>
+                </div>
+                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 bottom-6 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300",(selectedGroup !== null)&&"opacity-0 translate-y-10" )}>
+                    <span className="flex gap-2 items-center"><MouseLeft size={18}/>click cluster</span>
+                    <span className="flex gap-2 items-center"><MouseRight size={18}/> Drag with left mouse button</span>
+                    <span className="flex gap-2 items-center"><Move size={18}/>drag screen</span>
+                    <span className="flex gap-2 items-center">
+                        <div className="flex">
+                            <ZoomIn size={18}/>
+                            <ZoomOut size={18}/>
+                        </div>
+                        scroll up, down
+                    </span>
+                </div>
                 <ClusterInfoPanel
                     scene={scene}
                     selectedClusterId={selectedClusterId}
