@@ -1,5 +1,5 @@
 "use client";
-import {MouseLeft, Grip, Move, Move3D, ZoomIn, ZoomOut, MouseRight,} from "lucide-react";
+import {MouseLeft, Move, ZoomIn, ZoomOut, MouseRight,} from "lucide-react";
 
 import {Canvas} from "@react-three/fiber";
 import {useMemo, useState} from "react";
@@ -39,9 +39,9 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
     };
 
     return (
-        <section className={cn(className)}>
+        <section className={cn("min-h-0 overflow-hidden", className)}>
             <div className="relative h-full min-h-0 overflow-hidden">
-                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 top-3 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300",(selectedGroup !== null)&&"opacity-0 -translate-y-10" )}>
+                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 top-3 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300 shrink-0",(selectedGroup !== null)&&"opacity-0 -translate-y-10" )}>
                     <span>{snapshot.clusters.filter((cluster)=>!cluster.isNoise).length} clusters</span>
                     <span>
                     {snapshot.clusters
@@ -54,7 +54,7 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                         .reduce((sum, cluster) => sum + cluster.articleCount-1, 0)} connections
                     </span>
                 </div>
-                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 bottom-6 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300",(selectedGroup !== null)&&"opacity-0 translate-y-10" )}>
+                <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 bottom-6 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300  shrink-0",(selectedGroup !== null)&&"opacity-0 translate-y-10" )}>
                     <span className="flex gap-2 items-center"><MouseLeft size={18}/>click cluster</span>
                     <span className="flex gap-2 items-center"><MouseRight size={18}/> Drag with left mouse button</span>
                     <span className="flex gap-2 items-center"><Move size={18}/>drag screen</span>
@@ -75,7 +75,7 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
                     onNodeSelect={handleNodeSelect}
                 />
                 {/* 카메라가 바라볼 대상은 선택 노드가 우선이고, 없으면 선택 클러스터 중심입니다. */}
-                <div className="h-full z-0">
+                <div className="h-full min-h-0 z-0">
                 <ClusterGraphCanvas
                     scene={scene}
                     selectedNode={selectedNode}

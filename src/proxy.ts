@@ -6,7 +6,7 @@ const AUTHENTICATED_PATHS = [
 ]
 
 export default async function middleware(request: NextRequest) {
-    const session = request.cookies.get('JSESSIONID')?.value
+    const session = request.cookies.get('GAL_AUT')?.value
     const { pathname } = request.nextUrl
 
     const isProtectedPath = AUTHENTICATED_PATHS.some(path => pathname.startsWith(path))

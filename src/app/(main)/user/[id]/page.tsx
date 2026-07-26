@@ -28,10 +28,10 @@ export default async function Page({ params }:PageProps){
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL);
 
     // 현재 로그인한 사용자 정보입니다. 프로필 주인과 로그인 사용자를 비교할 때 사용할 수 있습니다.
-    const userInfo = await getAuthenticatedUser()
+    await getAuthenticatedUser()
 
     return(
-        <div className="h-screen w-screen flex pt-15">
+        <div className="h-dvh w-screen flex overflow-hidden pt-15 box-border">
             {/* 왼쪽 사이드바: 프로필 이미지, 닉네임, 소개, 통계 영역 */}
             <aside className="w-xs flex flex-col items-center py-25">
                 <div className="flex flex-col gap-3 items-center justify-center">
@@ -58,8 +58,8 @@ export default async function Page({ params }:PageProps){
             </aside>
 
             {/* 오른쪽 메인 영역: 사용자의 클러스터 네트워크를 렌더링합니다. */}
-            <div className="flex-1 flex flex-col">
-                <div className="h-full w-full">
+            <div className="flex-1 flex min-h-0 flex-col overflow-hidden">
+                <div className="h-full min-h-0 w-full overflow-hidden">
                     <UserClusterNetwork userId={userProfile.userId}/>
                 </div>
             </div>

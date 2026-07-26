@@ -14,14 +14,14 @@ export interface UserInfo{
 
 export const getAuthenticatedUser = cache(async ():Promise<UserInfo | null> =>{
     const cookieStore = await cookies();
-    const session = cookieStore.get('JSESSIONID')?.value;
+    const session = cookieStore.get('GAL_AUT')?.value;
 
     if(!session) return null;
 
     return lightApi.get<UserInfo>('/api/v1/users/me')
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL)
         .isCredentialRequest(true)
-        .cookies({JSESSIONID: session})
+        .cookies({GAL_AUT: session})
         .catch((e)=>{ return null })
 });
 
