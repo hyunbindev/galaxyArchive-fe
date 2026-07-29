@@ -61,9 +61,9 @@ export default async function Page({ params }:PageProps){
             <div className="mt-2 flex-1 flex min-h-0 flex-col overflow-hidden">
                 <Tabs defaultValue="overview" className="h-full min-h-0 w-full">
                     <TabsList variant="line">
-                        <TabsTrigger className="text-lg" value="clusters">Cluster</TabsTrigger>
-                        <TabsTrigger className="text-lg" value="articles">Articles</TabsTrigger>
-                        <TabsTrigger className="text-lg" value="activity">Activity</TabsTrigger>
+                        <TabsTrigger value="clusters">Cluster</TabsTrigger>
+                        <TabsTrigger value="articles">Articles</TabsTrigger>
+                        <TabsTrigger value="activity">Activity</TabsTrigger>
                     </TabsList>
                     <TabsContent value="clusters" className="min-h-0 overflow-hidden">
                         <div className="flex h-full min-h-0 w-full overflow-hidden">
