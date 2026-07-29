@@ -31,8 +31,8 @@ export default function UserClusterNetwork({ userId }: UserClusterNetworkProps) 
     }
 
     return (
-        <div className="flex h-full min-h-0 flex-col overflow-hidden">
-            <ClusterGraphView className="min-h-0 flex-1 overflow-hidden" snapshot={snapshot} />
+        <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
+            <ClusterGraphView className="min-h-0 w-full flex-1 overflow-hidden" snapshot={snapshot} />
         </div>
     )
 }

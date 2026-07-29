@@ -39,7 +39,7 @@ export default function ClusterGraphView({snapshot, className}: ClusterGraphView
     };
 
     return (
-        <section className={cn("min-h-0 overflow-hidden", className)}>
+        <section className={cn("h-full min-h-0 w-full overflow-hidden", className)}>
             <div className="relative h-full min-h-0 overflow-hidden">
                 <div className={cn("absolute text-xs select-none opacity-80 backdrop-blur-xs flex gap-5 font-light px-4 py-2 top-3 left-1/2 bg-background border border-accent rounded-sm -translate-x-1/2 z-2 transition-all duration-300 shrink-0",(selectedGroup !== null)&&"opacity-0 -translate-y-10" )}>
                     <span>{snapshot.clusters.filter((cluster)=>!cluster.isNoise).length} clusters</span>
