@@ -51,7 +51,7 @@ export default function useGetNewArticleList(authorId:string, size:number){
         if(lastArticleId==null && isLoading.current) return;
         const queryParams:Record<string,any> = { size : size , lastArticleId : lastArticleId.current }
         isLoading.current = true;
-        
+
         const res = await lightApi.get<ArticleSummaryPage>(`/api/v1/users/${authorId}/articles`)
             .baseUrl(process.env.INTERNAL_API_URL ? process.env.INTERNAL_API_URL : process.env.NEXT_PUBLIC_API_URL)
             .params(queryParams)

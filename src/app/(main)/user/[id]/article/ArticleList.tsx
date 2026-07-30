@@ -17,7 +17,7 @@ interface ArticleListProps{
 
 export default function ArticleList({authorId}:ArticleListProps){
     const [carouselApi, setCarouselApi] = useState<CarouselApi>();
-    const { articleSummeryPage, lastArticleId, requestNextPage } = useGetNewArticleList(authorId,10);
+    const { articleSummeryPage, lastArticleId, requestNextPage } = useGetNewArticleList(authorId,6);
 
 
     useEffect(() => {
@@ -46,13 +46,13 @@ export default function ArticleList({authorId}:ArticleListProps){
                     <CarouselContent>
                         {
                             articleSummeryPage.map((page,index)=>(
-                            <CarouselItem key={index}>
-                                <div className="grid grid-cols-5 gap-5">
-                                    {
-                                        page.map((summary)=>(<ArticleSummaryElement key={summary.id} articleSummary={summary}/>))
-                                    }
-                                </div>
-                            </CarouselItem>))
+                                <CarouselItem key={index}>
+                                    <div className="grid grid-cols-6 gap-5">
+                                        {
+                                            page.map((summary)=>(<ArticleSummaryElement key={summary.id} articleSummary={summary}/>))
+                                        }
+                                    </div>
+                                </CarouselItem>))
                         }
                     </CarouselContent>
                     <CarouselPrevious />

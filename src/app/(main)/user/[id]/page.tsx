@@ -4,6 +4,7 @@ import {getAuthenticatedUser} from "@/lib/getAuthenticatedUser";
 
 import UserClusterNetwork from "@/app/(main)/user/[id]/cluster/UserClusterNetwork";
 import {Tabs, TabsContent, TabsList, TabsTrigger} from "@/components/ui/tabs";
+import UserArticles from "@/app/(main)/user/[id]/article/UserArticles";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -21,14 +22,11 @@ export interface UserProfile{
 }
 
 export default async function Page({ params }:PageProps){
-    // URL??[id] 媛믪쓣 爰쇰궡???대떦 ?ъ슜?먯쓽 ?꾨줈?꾩쓣 議고쉶?⑸땲??
     const { id } = await params;
 
-    // ?쒕쾭 而댄룷?뚰듃?먯꽌 ?대? API 二쇱냼瑜??곗꽑 ?ъ슜?섍퀬, ?놁쑝硫?public API 二쇱냼瑜??ъ슜?⑸땲??
     const userProfile:UserProfile = await lightApi.get<UserProfile>(`/api/v1/users/profiles/${id}`)
         .baseUrl(process.env.INTERNAL_API_URL? process.env.INTERNAL_API_URL:process.env.NEXT_PUBLIC_API_URL);
 
-    // ?꾩옱 濡쒓렇?명븳 ?ъ슜???뺣낫?낅땲?? ?꾨줈??二쇱씤怨?濡쒓렇???ъ슜?먮? 鍮꾧탳?????ъ슜?????덉뒿?덈떎.
     await getAuthenticatedUser()
 
     return(
@@ -57,9 +55,8 @@ export default async function Page({ params }:PageProps){
                 </div>
             </aside>
 
-            {/* ?ㅻⅨ履?硫붿씤 ?곸뿭: ?ъ슜?먯쓽 ?대윭?ㅽ꽣 ?ㅽ듃?뚰겕瑜??뚮뜑留곹빀?덈떎. */}
             <div className="mt-2 flex-1 flex min-h-0 flex-col overflow-hidden">
-                <Tabs defaultValue="overview" className="h-full min-h-0 w-full">
+                <Tabs defaultValue="clusters" className="h-full min-h-0 w-full">
                     <TabsList variant="line">
                         <TabsTrigger value="clusters">Cluster</TabsTrigger>
                         <TabsTrigger value="articles">Articles</TabsTrigger>
@@ -72,7 +69,7 @@ export default async function Page({ params }:PageProps){
 
                     </TabsContent>
                     <TabsContent value="articles">
-                        articles
+                        <UserArticles authorId={userProfile.userId}/>
                     </TabsContent>
                     <TabsContent value="activity">
                         activities
