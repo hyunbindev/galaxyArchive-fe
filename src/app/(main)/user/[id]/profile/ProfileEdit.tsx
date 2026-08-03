@@ -13,7 +13,7 @@ import {Label} from "@/components/ui/label";
 import {Input} from "@/components/ui/input";
 import {Button} from "@/components/ui/button";
 import {Pencil} from "lucide-react";
-import {UserProfile} from "@/app/(main)/user/[id]/page";
+import {UserProfile} from "@/app/(main)/user/[id]/type";
 import {cn} from "@/lib/utils";
 import useUserProfileUpdate from "@/app/(main)/user/[id]/profile/useUserProfileUpdate";
 import {useState} from "react";

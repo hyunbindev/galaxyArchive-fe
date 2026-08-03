@@ -1,4 +1,4 @@
-import {redirect} from "next/navigation";
+import UserArticles from "@/app/(main)/user/[id]/article/UserArticles";
 
 interface PageProps {
     params: Promise<{ id: string }>;
@@ -7,5 +7,5 @@ interface PageProps {
 export default async function Page({params}: PageProps) {
     const {id} = await params;
 
-    redirect(`/user/${id}/cluster`);
+    return <UserArticles authorId={id}/>;
 }

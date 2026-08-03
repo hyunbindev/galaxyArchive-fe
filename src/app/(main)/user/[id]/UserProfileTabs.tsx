@@ -19,15 +19,15 @@ export default function UserProfileTabs({ userId }: UserProfileTabsProps) {
                 </TabsList>
             </div>
 
-            <TabsContent value="Networks" className="mb-0 flex min-h-0 flex-col">
+            <TabsContent value="Networks" className="mb-0 flex min-h-0 flex-1 flex-col">
                 <UserClusterNetwork userId={userId}/>
             </TabsContent>
 
-            <TabsContent value="Articles" className="mb-0 flex min-h-0 flex-col">
+            <TabsContent value="Articles" className="mb-0 flex min-h-0 flex-1 flex-col">
                 <ArticleList authorId={userId}/>
             </TabsContent>
 
-            <TabsContent value="Activity" className="mb-0 flex min-h-0 flex-col">
+            <TabsContent value="Activity" className="mb-0 flex min-h-0 flex-1 flex-col">
                 <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
                     No activity view yet.
                 </div>
