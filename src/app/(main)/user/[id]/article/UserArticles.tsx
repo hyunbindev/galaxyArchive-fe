@@ -7,7 +7,7 @@ interface UserArticles{
 
 export default function UserArticles({authorId}:UserArticles){
     return(
-        <div className="h-full min-h-0 w-full my-5">
+        <div className="h-full min-h-0 w-full p-5">
             <ArticleList authorId={authorId}/>
         </div>
     )

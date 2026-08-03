@@ -1,613 +1,101 @@
+"use client";
+
 import Image from "next/image";
+import Link from "next/link";
 import {Badge} from "@/components/ui/badge";
 import {MessageSquare} from "lucide-react";
+import {dateConvert} from "@/lib/utils";
+import useGetNewArticleList, {ArticleSummary} from "@/app/(main)/user/[id]/article/useGetNewArticleList";
 
 interface ArticleListProps {
     authorId: string;
 }
 
-export default function ArticleList({ authorId }: ArticleListProps) {
+interface ArticleListItemProps {
+    article: ArticleSummary;
+}
+
+function ArticleListItem({article}: ArticleListItemProps) {
+    return (
+        <li className="w-full max-w-3xl rounded-sm border border-accent px-6 py-4 transition-all duration-300 hover:bg-accent">
+            <Link href={`/article/${article.id}`} className="block">
+                <div className="flex items-stretch gap-3">
+                    <div className="min-w-0 flex-1">
+                        <div className="mb-1 flex flex-col">
+                            <span className="text-xs text-muted-foreground">{dateConvert(article.createdAt)}</span>
+                            <h2 className="line-clamp-2 text-lg">{article.title}</h2>
+                        </div>
+
+                        <p className="mx-1 line-clamp-3 text-sm text-muted-foreground">
+                            {article.description}
+                        </p>
+
+                        <div className="my-3 flex flex-wrap gap-1">
+                            {article.keywords.map((keyword) => (
+                                <Badge
+                                    key={keyword}
+                                    className="max-w-32 truncate text-xs text-muted-foreground"
+                                    variant="outline"
+                                >
+                                    {keyword}
+                                </Badge>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
+                        <Image
+                            alt=""
+                            src={`https://picsum.photos/seed/article-${article.id}/320/240`}
+                            fill
+                            className="object-cover"
+                            sizes="160px"
+                        />
+                    </div>
+                </div>
+
+                <div className="mt-3 flex gap-2 border-t border-t-accent px-1 pt-2">
+                    <div className="flex items-center text-muted-foreground">
+                        <MessageSquare size={16} className="mr-1.5 stroke-current"/>
+                        <span className="text-sm">{article.commentsCount}</span>
+                    </div>
+                </div>
+            </Link>
+        </li>
+    );
+}
+
+export default function ArticleList({authorId}: ArticleListProps) {
+    const {articles, hasNextPage, isLoading, requestNextPage} = useGetNewArticleList(authorId, 10);
+
     return (
         <div className="h-full min-h-0 w-full overflow-hidden">
-            <ul className="flex h-full w-full flex-col items-center gap-2 overflow-y-auto">
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
+            <ul
+                className="no-scrollbar flex h-full w-full flex-col items-center gap-2 overflow-y-auto"
+                onScroll={(event) => {
+                    const target = event.currentTarget;
+                    const isNearBottom = target.scrollHeight - target.scrollTop - target.clientHeight < 80;
 
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
+                    if (isNearBottom && hasNextPage && !isLoading) {
+                        requestNextPage().catch(console.error);
+                    }
+                }}
+            >
+                {articles.map((article) => (
+                    <ArticleListItem key={article.id} article={article}/>
+                ))}
 
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
+                {!isLoading && articles.length === 0 && (
+                    <li className="flex h-full items-center justify-center text-sm text-muted-foreground">
+                        No articles yet.
+                    </li>
+                )}
 
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
-                <li className="w-3xl rounded-sm border border-accent py-4 px-6 hover:bg-accent cursor-pointer transition-all duration-300">
-                    <div className="flex items-stretch gap-3">
-                        <div className="min-w-0 flex-1">
-                            <div className="mb-1 flex flex-col">
-                                <span className="text-xs text-muted-foreground">2026.01.06</span>
-                                <h1 className="text-lg">게시글 제목</h1>
-                            </div>
-
-                            <p className="text-sm text-muted-foreground mx-1">
-                                게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary게시글 summary
-                            </p>
-                            <div className="flex my-3 gap-1">
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                                <Badge
-                                    className="text-xs text-muted-foreground truncate"
-                                    variant="outline">
-                                    키워드1
-                                </Badge>
-                            </div>
-                        </div>
-                        <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
-                            <Image
-                                alt="image describe"
-                                src="https://picsum.photos/800/600"
-                                fill
-                                className="object-cover"
-                                sizes="160px"
-                            />
-                        </div>
-                    </div>
-                    <div className="flex gap-2 border-t border-t-accent px-1 mt-3 pt-2">
-                        <div className="flex text-muted-foreground items-center">
-                            <MessageSquare size={16} className="stroke-current mr-1.5"/>
-                            <span className="text-sm">12</span>
-                        </div>
-                    </div>
-                </li>
+                {isLoading && (
+                    <li className="py-4 text-sm text-muted-foreground">
+                        Loading...
+                    </li>
+                )}
             </ul>
         </div>
     );
