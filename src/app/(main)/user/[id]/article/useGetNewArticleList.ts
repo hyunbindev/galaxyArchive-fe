@@ -10,6 +10,7 @@ export interface ArticleSummary {
     description: string;
     commentsCount: number;
     keywords: string[];
+    thumbnailUrl:string | null;
 }
 
 export interface ArticleSummaryPage {

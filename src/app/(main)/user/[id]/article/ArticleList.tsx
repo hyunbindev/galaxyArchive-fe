@@ -43,15 +43,18 @@ function ArticleListItem({article}: ArticleListItemProps) {
                         </div>
                     </div>
 
+                    {article.thumbnailUrl &&
                     <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
                         <Image
-                            alt=""
-                            src={`https://picsum.photos/seed/article-${article.id}/320/240`}
+                            alt={`${article.title}'thumbnail image`}
+                            src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${article.thumbnailUrl}`}
                             fill
+                            unoptimized
                             className="object-cover"
                             sizes="160px"
                         />
                     </div>
+                    }
                 </div>
 
                 <div className="mt-3 flex gap-2 border-t border-t-accent px-1 pt-2">
@@ -69,6 +72,7 @@ export default function ArticleList({authorId}: ArticleListProps) {
     const {articles, hasNextPage, isLoading, requestNextPage} = useGetNewArticleList(authorId, 10);
 
     return (
+
         <div className="h-full min-h-0 w-full overflow-hidden">
             <ul
                 className="no-scrollbar flex h-full w-full flex-col items-center gap-2 overflow-y-auto"
