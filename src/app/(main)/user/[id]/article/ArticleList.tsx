@@ -44,7 +44,7 @@ function ArticleListItem({article}: ArticleListItemProps) {
                     </div>
 
                     {article.thumbnailUrl &&
-                    <div className="relative w-40 shrink-0 overflow-hidden rounded-sm">
+                    <div className="relative h-40 w-40 shrink-0 overflow-hidden rounded-sm">
                         <Image
                             alt={`${article.title}'thumbnail image`}
                             src={`${process.env.NEXT_PUBLIC_IMAGE_BASE_URL}/${article.thumbnailUrl}`}
