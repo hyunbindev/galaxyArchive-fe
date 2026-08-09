@@ -2,7 +2,7 @@
 import {cn, dateConvert} from "@/lib/utils";
 import {Badge} from "@/components/ui/badge";
 import {ClusterKeywordNode, ClusterNode} from "@/components/view/clustergraphview/type";
-import {MessageSquare, X} from "lucide-react";
+import {Eye, MessageSquare, X} from "lucide-react";
 import useGetClusterArticleSummary from "@/components/view/clustergraphview/useGetClusterArticleSummary";
 
 import {toClusterScene} from "@/components/view/clustergraphview/toClusterScene";
@@ -97,10 +97,14 @@ export default function ClusterInfoPanel({scene, onNodeSelect, className,selecte
                                 </div>
 
                                 {summary.id === selectedNode?.id &&
-                                <div className="flex justify-between border-t border-accent pt-2 px-2">
+                                <div className="flex justify-start border-t border-accent gap-5 pt-2 px-2">
                                     <div className="flex text-muted-foreground items-center">
                                         <MessageSquare size={12} className="stroke-current mr-1.5"/>
                                         <span className="text-xs">{summary.commentsCount}</span>
+                                    </div>
+                                    <div className="flex text-muted-foreground items-center">
+                                        <Eye size={12} className="stroke-current mr-1.5"/>
+                                        <span className="text-xs">{summary.viewCount}</span>
                                     </div>
                                 </div>}
                             </div>

@@ -11,6 +11,7 @@ export interface ArticleSummary {
     commentsCount: number;
     keywords: string[];
     thumbnailUrl:string | null;
+    viewCount:number;
 }
 
 export interface ArticleSummaryPage {

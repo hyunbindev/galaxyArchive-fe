@@ -21,7 +21,7 @@ export default function ArticleSummaryElement({articleSummary}:ArticleSummaryEle
                 <span className="text-sm text-muted-foreground line-clamp-2 mx-1">{articleSummary.description}</span>
                 <div className="py-2 gap-1 h-8 line-clamp-1">
                     {
-                        articleSummary.keywords.map((keyword)=>(<Badge key={keyword} className="text-xs my-0.5 ml-0.5 text-muted-foreground shrink-0" variant="outline">{keyword}</Badge>))
+                        articleSummary.keywords.map((keyword,idx)=>(<Badge key={idx} className="text-xs my-0.5 ml-0.5 text-muted-foreground shrink-0" variant="outline">{keyword}</Badge>))
                     }
                 </div>
                 <div className="flex text-muted-foreground mx-2">

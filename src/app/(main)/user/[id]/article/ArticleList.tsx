@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import {Badge} from "@/components/ui/badge";
-import {MessageSquare} from "lucide-react";
+import {Eye, MessageSquare} from "lucide-react";
 import {dateConvert} from "@/lib/utils";
 import useGetNewArticleList, {ArticleSummary} from "@/app/(main)/user/[id]/article/useGetNewArticleList";
 
@@ -57,10 +57,14 @@ function ArticleListItem({article}: ArticleListItemProps) {
                     }
                 </div>
 
-                <div className="mt-3 flex gap-2 border-t border-t-accent px-1 pt-2">
+                <div className="mt-3 flex gap-3 border-t border-t-accent px-1 pt-2">
                     <div className="flex items-center text-muted-foreground">
                         <MessageSquare size={16} className="mr-1.5 stroke-current"/>
                         <span className="text-sm">{article.commentsCount}</span>
+                    </div>
+                    <div className="flex items-center text-muted-foreground">
+                        <Eye size={16} className="mr-1.5 stroke-current"/>
+                        <span className="text-sm">{article.viewCount}</span>
                     </div>
                 </div>
             </Link>
