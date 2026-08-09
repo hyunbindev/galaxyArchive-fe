@@ -24,7 +24,7 @@ export default async function middleware(request: NextRequest) {
     if (!visitorId) {
         try {
             const identityResponse = await fetch(
-                `${process.env.NEXT_PUBLIC_API_URL}/internal/api/v1/tracking/identity`,
+                `${process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL}/internal/api/v1/tracking/identity`,
                 {
                     method: 'POST',
                     cache: 'no-store',
